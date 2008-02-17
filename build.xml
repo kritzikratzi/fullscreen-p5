@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Part of the Processing Fullscreen API
+
+  Copyright (c) 2006-08 Hansi Raber
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+-->
+<project name="Processing Fullscreen API" default="dist">
+	<property name="version" value="0.95"/>
+	
+	<target name="dist">
+		<mkdir dir="dist"/>
+		<mkdir dir="fs_api"/>
+		<mkdir dir="fs_api/library"/>
+		
+		<!-- copy documentation files -->
+		<copy todir="fs_api">
+			<fileset dir="docs" excludes="**/.*"/>
+		</copy>
+		
+		<!-- copy native library files -->
+		<copy todir="fs_api/library/">
+			<fileset dir="lib"/>
+		</copy>
+		
+		<!-- create the jar file and copy it over -->
+		<jar destfile="fs_api/library/fullscreen.jar" basedir="bin"/>
+		
+		<!-- done, zip it up! -->
+		<zip destfile="dist/fullscreen.zip">
+			<fileset dir="fs_api" excludes="**/.*"/>
+		</zip>
+		
+		<!-- for archiving purposes we also create a fs-xxx.zip -->
+		<copy file="dist/fullscreen.zip" tofile="dist/fullscreen-${version}.zip"/>
+		
+		<delete dir="fs_api"/>
+		
+		<!-- - - - - - - - - - - - - - - -  -->
+		<!-- now create the source snapshot -->
+		<mkdir dir="fs_src"/>
+		
+		<copy todir="fs_src/src">
+			<fileset dir="src"/>
+		</copy>
+		<copy todir="fs_src/docs">
+			<fileset dir="docs"/>
+		</copy>
+		<copy todir="fs_src/lib">
+			<fileset dir="lib"/>
+		</copy>
+		<copy todir="fs_src/" file="build.xml"/>
+		<zip destfile="dist/fullscreen-src.zip">
+			<fileset dir="fs_src" excludes="**/.*"/>
+		</zip>
+		<copy file="dist/fullscreen-src.zip" tofile="dist/fullscreen-src-${version}.zip"/>
+		
+		<delete dir="fs_src"/>
+	</target>
+	
+	<target name="install" depends="dist">
+		<unzip dest="/Applications/Processing/libraries/fullscreen/">
+			<fileset file="dist/fullscreen.zip"/>
+		</unzip>
+	</target>
+</project>
