@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="dependencies/processing-core.jar"/>
+	<classpathentry kind="lib" path="dependencies/processing-opengl.jar" sourcepath="/processing-head/opengl/src"/>
+	<classpathentry kind="lib" path="dependencies/jogl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -20,7 +20,7 @@
 */
 package fullscreen;
 
-import java.lang.reflect.Field;
+import java.awt.MenuShortcut;
 import java.lang.reflect.Method;
 
 import processing.core.PApplet;
@@ -39,5 +39,11 @@ class Helper {
 			
 		}
 	}
-
+	
+	
+	/**
+	 * Adds listeners
+	 */
+	public static void addKeyListeners( PApplet p, FullScreen f ){
+	}
 }

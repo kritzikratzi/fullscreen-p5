@@ -31,6 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import processing.core.GLFullScreenHelper;
 import processing.core.PApplet;
 
 /**
@@ -68,7 +69,7 @@ import processing.core.PApplet;
  * TODO: Mouselisteners 
  */
 
-public class FullScreen{
+public class FullScreen extends FullScreenBase {
 	// We use this frame to go to fullScreen mode...
 	GraphicsDevice fsDevice;
 	
@@ -86,30 +87,18 @@ public class FullScreen{
 	// Refresh rate
 	private int refreshRate; 
 	
-	// nasty nasty
-	int superfuckingNastyhack = 0; 
-	
 	/**
 	 * 
 	 */
 	public FullScreen( PApplet dad ){
+		super( dad ); 
+		this.dad = dad; 
 		fsDevice = dad.frame.getGraphicsConfiguration().getDevice();
 		
-		if( dad.g.getClass().getName().equals( "processing.opengl.PGraphicsOpenGL" ) ){
-			System.err.println( "FullScreen API: Warning, OPENGL Support is experimental! " ); 
-			System.err.println( "Keep checking http://www.superduper.org/processing/fullscreen_api/ for updates!" );
-		}
-		
-		this.dad = dad; 
-		dad.registerKeyEvent( this );
-		dad.registerDraw( this ); 
-		dad.frame.addKeyListener( new FSKeyListener( this ) ); 
-		dad.frame.addWindowListener( new FSWindowListener() );
 		
 		if( dad.width > 0 ){
 			setResolution( dad.width, dad.height );
 		}
-		
 	}
 	
 	
@@ -118,7 +107,7 @@ public class FullScreen{
 	 *
 	 * @returns true if so, yes if not
 	 */
-	boolean isFullScreen(){
+	public boolean isFullScreen(){
 		return fsDevice.getFullScreenWindow() == dad.frame; 
 	}
 	
@@ -132,46 +121,26 @@ public class FullScreen{
 		return dad.frame != null;
 	}
 	
-	
-	/**
-	 * Enters fullscreen mode
-	 * 
-	 * @returns true on success
-	 */
-	public boolean enter(){
-		return setFullScreen( true ); 
-	}
-	
-	
-	/**
-	 * Leaves fullscreen mode
-	 * 
-	 * @returns true on success
-	 */
-	public boolean leave(){
-		return setFullScreen( false ); 
-	}
-	
-	
+
 	/**
 	 * Enters/Leaves fullScreen mode. 
 	 *
 	 * @param fullScreen true or false
 	 * @returns true on success
 	 */
-	public boolean setFullScreen( boolean fullScreen ){
+	public void setFullScreen( boolean fullScreen ){
 		// If it's called from setup we wait until the applet initialized properly
-		if( dad.frameCount == 0 && fullScreen == true ){
+		/*if( dad.frameCount == 0 && fullScreen == true ){
 			new FSWaitForInitThread().start(); 
 			
 			return true; 
-		}
+		}*/
 		
 		
 		
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
-			return true; 
+			return; 
 		}
 		else if( fullScreen ){
 			// go to fullScreen mode...
@@ -193,17 +162,14 @@ public class FullScreen{
 				// set default resolution...
 				setResolution( 0, 0 ); 
 				
-				// update texture space
-				processing.core.fullscreen_texturehelper.update( dad ); 
-				
 				// Tell the sketch about the resolution change
 				Helper.notifySketch( dad ); 
 				
-				return true; 
+				return; 
 			}
 			else{
 				System.err.println( "FullScreen API: Fullscreen mode not available" ); 
-				return false; 
+				return; 
 			}
 		}
 		else{
@@ -219,12 +185,10 @@ public class FullScreen{
 			dad.requestFocus(); 
 			System.out.println( "show" ); 
 	
-			processing.core.fullscreen_texturehelper.update( dad );
-			
 			// Tell the sketch about the resolution change
 			Helper.notifySketch( dad ); 
 			
-			return true; 
+			return; 
 		}
 	}
 	
@@ -294,64 +258,12 @@ public class FullScreen{
 	}
 	
 	
-	final static int fsControlKey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-	static KeyEvent lastEvent = null; 
-	public void keyEvent( KeyEvent e ){
-		if( e.equals( lastEvent ) ){
-			return; 
-		}
-		
-		lastEvent = e; 
-		
-		// Catch the ESC key if in fullscreen mode
-		if( e.getKeyCode() == KeyEvent.VK_ESCAPE ){
-			if( isFullScreen() ){
-				if( e.getID() == KeyEvent.KEY_RELEASED ){
-					superfuckingNastyhack = 1;  
-				}
-			}
-		}
-		
-		// catch the CMD+F combination (ALT+ENTER or CTRL+F for windows)
-		else if( e.getID() == KeyEvent.KEY_PRESSED ){
-			if( ( e.getKeyCode() == e.VK_F && e.getModifiers() == fsControlKey ) ||
-					( dad.platform == dad.WINDOWS && e.getKeyCode() == e.VK_ENTER && e.getModifiers() == e.VK_ALT ) ){
-				// toggle fullscreen! 
-				superfuckingNastyhack = 2;  
-			}
-		}
-	}
-	
-	class FSKeyListener extends KeyAdapter{
-		FullScreen fs; 
-		public FSKeyListener( FullScreen fs ){
-			this.fs = fs; 
-		}
-		
-		public void keyPressed( KeyEvent e ){
-			fs.keyEvent( e ); 
-		}
-	}
-	
-	/**
-	 * A window listener for the fullscreen window, that 
-	 * calls the exit() function of processing when the window 
-	 * is closed (using alt+f4, apple+w, or whatever)
-	 */
-	class FSWindowListener extends WindowAdapter{
-		public void windowClosing( WindowEvent e ){
-			// let processing exit! 
-			dad.exit(); 
-		}
-	}
-	
-	
 	
 	/**
 	 * A thread that invokes the setFullScreen() functionality delayed, 
 	 * in case it's called from setup()
 	 */
-	class FSWaitForInitThread extends Thread{
+	/*class FSWaitForInitThread extends Thread{
 		public void run(){
 			while( dad.frameCount < 5 ){
 				try{
@@ -367,24 +279,8 @@ public class FullScreen{
 				System.err.println( "FullScreen API: Failed to go to fullscreen mode" );
 			}
 		}
-	}
+	}*/
 	
-	/**
-	 * In draw..
-	 */
-	public void draw(){
-		if( superfuckingNastyhack == 0 ){
-			return; 
-		}
-		else if( superfuckingNastyhack == 1 ){
-			setFullScreen( false );
-			superfuckingNastyhack = 0; 
-		}
-		else if( superfuckingNastyhack == 2 ){
-			setFullScreen( !isFullScreen() );
-			superfuckingNastyhack = 0; 
-		}
-	}
 	/**
 	 * Returns the current refresh rate
 	 */

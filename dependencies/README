@@ -1,0 +1,10 @@
+Build-Dependencies
+==================
+
+   Those files are needed for building the fullscreen api, they're not being 
+distributed with the applications. All the libraries used here are distributed
+under the gpl.   
+
+
+core.jar, opengl.jar: Part of processing, http://www.processing.org
+jogl.jar: Part of Java-OpenGL, https://jogl.dev.java.net/ 

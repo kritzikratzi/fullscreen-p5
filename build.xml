@@ -20,9 +20,24 @@
   Boston, MA  02111-1307  USA
 -->
 <project name="Processing Fullscreen API" default="dist">
-	<property name="version" value="0.95"/>
+	<property name="processing.path" value="/Applications/Processing"/>
 	
-	<target name="dist">
+	<property name="version" value="0.95"/>
+	<fileset id="cp" includes="dependencies/*.jar"/>
+	<path id="cp">
+		<fileset dir="." includes="dependencies/*.jar"/>
+	</path>
+	
+	<target name="clean">
+		<delete dir="bin"/>
+	</target>
+		
+	<target name="compile">
+		<mkdir dir="bin"/>
+		<javac srcdir="src" destdir="bin" classpathref="cp"/>
+	</target>
+	
+	<target name="dist" depends="compile">
 		<mkdir dir="dist"/>
 		<mkdir dir="fs_api"/>
 		<mkdir dir="fs_api/library"/>
@@ -73,7 +88,7 @@
 	</target>
 	
 	<target name="install" depends="dist">
-		<unzip dest="/Applications/Processing/libraries/fullscreen/">
+		<unzip dest="${processing.path}/libraries/fullscreen/">
 			<fileset file="dist/fullscreen.zip"/>
 		</unzip>
 	</target>
