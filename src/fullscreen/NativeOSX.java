@@ -18,43 +18,24 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 */
-//
-//  NativeOSX.java
-//
-//  Created by hansi on 29.10.07.
-//  Copyright (c) 2007 __MyCompanyName__. All rights reserved.
-//
 
 package fullscreen; 
 
-import javax.swing.*; 
 
+/**
+ * This class hides/shows the menubar on osx system. 
+ * 
+ * @author hansi
+ */
 public class NativeOSX {
 
     static {
-    	System.out.println( "loading libhide..." );
-    	System.out.println( System.getProperty( "java.library.path" ) ); 
         // Ensure native JNI library is loaded
         System.loadLibrary("hide_menubar");
     }
 
     public NativeOSX() {
-        System.out.println("JNIWrapper instance created");
     }
 
 	native void setVisible( boolean arg ); 
-
-    public static void main (String args[]) {
-        // insert code here...
-        System.out.println("Started JNIWrapper");
-        NativeOSX newjni = new NativeOSX();
-        newjni.setVisible(false);
-		
-		JFrame frame = new JFrame( "hey" );
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 
-		frame.setSize( 320, 240 ); 
-		frame.setLocation( 0, 0 ); 
-		frame.setUndecorated( true );
-		frame.setVisible( true );
-    }
 }

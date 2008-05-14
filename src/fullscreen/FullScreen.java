@@ -20,18 +20,9 @@
 */
 package fullscreen;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
-import java.awt.Frame; 
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
-import processing.core.GLFullScreenHelper;
 import processing.core.PApplet;
 
 /**
@@ -202,7 +193,7 @@ public class FullScreen extends FullScreenBase {
 	 *
 	 * @returns true if resolution change succeeded, false if not
 	 */
-	public boolean setResolution( int xRes, int yRes ){
+	public void setResolution( int xRes, int yRes ){
 		if( xRes > 0 && yRes > 0 ){
 			fsResolutionX = xRes; 
 			fsResolutionY = yRes; 
@@ -211,14 +202,14 @@ public class FullScreen extends FullScreenBase {
 		
 		// only change in fullscreen mode
 		if( !isFullScreen() ){
-			return false; 
+			return; 
 		}
 		
 		
 		// Change resolution only if values are somehow meaningfull
 		if( fsResolutionX <= 0 || fsResolutionY <= 0 ){
 			dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
-			return false; 
+			return; 
 		}
 		
 		DisplayMode modes[ ] = fsDevice.getDisplayModes(); 
@@ -238,7 +229,7 @@ public class FullScreen extends FullScreenBase {
 		if( theMode == null ){
 			System.err.println( "FullScreen API: Display mode not supported: " + fsResolutionX + "x" + fsResolutionY ); 
 			dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
-			return false; 
+			return; 
 		}
 	
 	
@@ -250,36 +241,12 @@ public class FullScreen extends FullScreenBase {
 		catch( Exception e ){
 			System.err.println( "FullScreen API: Failed to go to fullScreen mode" ); 
 			e.printStackTrace(); 
-			return false; 
+			return; 
 		}
 	
 		dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
-		return true; 
 	}
 	
-	
-	
-	/**
-	 * A thread that invokes the setFullScreen() functionality delayed, 
-	 * in case it's called from setup()
-	 */
-	/*class FSWaitForInitThread extends Thread{
-		public void run(){
-			while( dad.frameCount < 5 ){
-				try{
-					Thread.sleep( 1000 ); 
-				}
-				catch( Exception e ){
-					System.err.println( "FullScreen API: Failed to go to fullscreen mode" ); 
-					return; 
-				}
-			}
-			
-			if( !setFullScreen( true ) ){
-				System.err.println( "FullScreen API: Failed to go to fullscreen mode" );
-			}
-		}
-	}*/
 	
 	/**
 	 * Returns the current refresh rate

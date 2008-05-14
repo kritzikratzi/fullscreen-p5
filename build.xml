@@ -20,6 +20,7 @@
   Boston, MA  02111-1307  USA
 -->
 <project name="Processing Fullscreen API" default="dist">
+	<!-- path to the processing installation -->
 	<property name="processing.path" value="/Applications/Processing"/>
 	
 	<property name="version" value="0.95"/>
@@ -28,15 +29,18 @@
 		<fileset dir="." includes="dependencies/*.jar"/>
 	</path>
 	
+	<!-- empty the binary folder -->
 	<target name="clean">
 		<delete dir="bin"/>
 	</target>
 		
+	<!-- compile the sources, place the class files in the bin folder -->
 	<target name="compile">
 		<mkdir dir="bin"/>
 		<javac srcdir="src" destdir="bin" classpathref="cp"/>
 	</target>
 	
+	<!-- create the files for the website -->
 	<target name="dist" depends="compile">
 		<mkdir dir="dist"/>
 		<mkdir dir="fs_api"/>
@@ -69,6 +73,10 @@
 		<!-- now create the source snapshot -->
 		<mkdir dir="fs_src"/>
 		
+		<copy todir="fs_src/dependencies">
+			<fileset dir="dependencies"/>
+		</copy>
+		
 		<copy todir="fs_src/src">
 			<fileset dir="src"/>
 		</copy>
@@ -79,6 +87,8 @@
 			<fileset dir="lib"/>
 		</copy>
 		<copy todir="fs_src/" file="build.xml"/>
+		<copy todir="fs_src/" file="COPYING"/>
+		
 		<zip destfile="dist/fullscreen-src.zip">
 			<fileset dir="fs_src" excludes="**/.*"/>
 		</zip>
@@ -87,6 +97,7 @@
 		<delete dir="fs_src"/>
 	</target>
 	
+	<!-- install the library, the processing folder (at the top) has to be specified! -->
 	<target name="install" depends="dist">
 		<unzip dest="${processing.path}/libraries/fullscreen/">
 			<fileset file="dist/fullscreen.zip"/>

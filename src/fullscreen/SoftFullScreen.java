@@ -21,22 +21,10 @@
 package fullscreen;
 
 import java.awt.Color;
-import java.awt.DisplayMode;
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
-import java.awt.Frame; 
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
-import javax.media.opengl.GLEventListener;
-
-import processing.core.GLFullScreenHelper;
 import processing.core.PApplet;
-import processing.opengl.PGraphicsOpenGL;
 
 /**
  * FullScreen support for processing. 
@@ -91,12 +79,12 @@ public class SoftFullScreen extends FullScreenBase{
 	public SoftFullScreen( PApplet dad ){
 		super( dad ); 
 		this.dad = dad; 
-		
 		fsFrame.setTitle( "FullScreen" ); 
 		fsFrame.setUndecorated( true ); 
 		fsFrame.setBackground( Color.black ); 
 		fsFrame.setLayout( null ); 
-		fsFrame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
+		//fsFrame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
+		fsFrame.setSize( dad.width, dad.height ); 
 		
 		registerFrame( fsFrame ); 
 	}
@@ -150,7 +138,8 @@ public class SoftFullScreen extends FullScreenBase{
 					dad.width + dad.frame.insets().left + dad.frame.insets().right, 
 					dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
 				);*/
-				fsFrame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
+				//fsFrame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
+				fsFrame.setSize( dad.width, dad.height ); 
 
 				
 				fsFrame.add( dad ); 
@@ -190,4 +179,13 @@ public class SoftFullScreen extends FullScreenBase{
 			return; 
 		}
 	}
+
+
+	@Override
+	public void setResolution( int xRes, int yRes ) {
+		System.err.println( "Changing resolution is not supported in SoftFullScreen mode. " ); 
+		System.err.println( "Use the normal FullScreen mode to make use of that functionality.  " ); 
+	}
+
+
 }

@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 
 import processing.core.GLFullScreenHelper;
 import processing.core.PApplet;
@@ -50,7 +51,15 @@ public abstract class FullScreenBase {
 	public abstract boolean isFullScreen(); 
 	
 	
-	
+	/**
+	 * Set resolution
+	 * 
+	 * @param xRes x resolution
+	 * @param yRes y resolution
+	 */
+	public abstract void setResolution( int xRes, int yRes );  
+
+
 	/**
 	 * Enters fullscreen mode
 	 * 
@@ -75,7 +84,7 @@ public abstract class FullScreenBase {
 	 * 
 	 * @param state yes if true, no if false. 
 	 */
-	public void allowShortcuts( boolean state ){
+	public void setShortcutsEnabled( boolean state ){
 		enableKeyEvents = state; 
 	}
 	
@@ -87,7 +96,7 @@ public abstract class FullScreenBase {
 		// Key Listener
 		f.addKeyListener( new KeyAdapter(){
 			public void keyPressed( KeyEvent e ){
-				keyEvent( e ); 
+				keyEvent( e );
 			}
 		}); 
 		
