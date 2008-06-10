@@ -37,7 +37,7 @@
 	<!-- compile the sources, place the class files in the bin folder -->
 	<target name="compile">
 		<mkdir dir="bin"/>
-		<javac srcdir="src" destdir="bin" classpathref="cp"/>
+		<javac srcdir="src" destdir="bin" classpathref="cp" target="1.4" />
 	</target>
 	
 	<!-- create the files for the website -->
@@ -55,9 +55,13 @@
 		<copy todir="fs_api/library/">
 			<fileset dir="lib"/>
 		</copy>
+		<copy todir="fs_api/examples">
+			<fileset dir="examples"/>
+		</copy>
 		
-		<!-- create the jar file and copy it over -->
-		<jar destfile="fs_api/library/fullscreen.jar" basedir="bin"/>
+		<!-- create the jar files and copy them over -->
+		<jar destfile="fs_api/library/fullscreen.jar" basedir="bin" includes="fullscreen/**"/>
+		<jar destfile="fs_api/library/fullscreen_GLsupport.jar" basedir="bin" includes="processing/**"/>
 		
 		<!-- done, zip it up! -->
 		<zip destfile="dist/fullscreen.zip">
@@ -77,6 +81,9 @@
 			<fileset dir="dependencies"/>
 		</copy>
 		
+		<copy todir="fs_src/examples">
+			<fileset dir="examples"/>
+		</copy>
 		<copy todir="fs_src/src">
 			<fileset dir="src"/>
 		</copy>
