@@ -20,8 +20,10 @@
 */
 package fullscreen;
 
+import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 
 import processing.core.PApplet;
 
@@ -55,9 +57,6 @@ import processing.core.PApplet;
  * - Only works for applications (not for applets)
  * 
  * by hansi, http://www.superduper.org,  http://www.fabrica.it
- *
- *
- * TODO: Mouselisteners 
  */
 
 public class FullScreen extends FullScreenBase {
@@ -79,17 +78,32 @@ public class FullScreen extends FullScreenBase {
 	private int refreshRate; 
 	
 	/**
-	 * 
+	 * Create a new fullscreen object
 	 */
-	public FullScreen( PApplet dad ){
+	public FullScreen( final PApplet dad, int screenNr ){
 		super( dad ); 
 		this.dad = dad; 
-		fsDevice = dad.frame.getGraphicsConfiguration().getDevice();
+		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+		if( screenNr >= devices.length ){
+			System.err.println( "FullScreen API: You requested to use screen nr. " + screenNr + ", " ); 
+			System.err.println( "however, there are only " + devices.length + " screens in your environment. " ); 
+			System.err.println( "Continuing with screen nr. 0" );
+			screenNr = 0; 
+		}
+		
+		fsDevice = devices[screenNr]; 
 		
 		
 		if( dad.width > 0 ){
 			setResolution( dad.width, dad.height );
 		}
+	}
+	
+	/**
+	 * Create a fullscreen object based on a specific screen
+	 */
+	public FullScreen( PApplet dad ){
+		this( dad, 0 ); 
 	}
 	
 	
@@ -120,15 +134,6 @@ public class FullScreen extends FullScreenBase {
 	 * @returns true on success
 	 */
 	public void setFullScreen( boolean fullScreen ){
-		// If it's called from setup we wait until the applet initialized properly
-		/*if( dad.frameCount == 0 && fullScreen == true ){
-			new FSWaitForInitThread().start(); 
-			
-			return true; 
-		}*/
-		
-		
-		
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -141,10 +146,6 @@ public class FullScreen extends FullScreenBase {
 				dad.frame.dispose(); 
 				dad.frame.setUndecorated( true ); 
 				dad.frame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
-//				dad.frame.setSize(
-//					dad.width + dad.frame.insets().left + dad.frame.insets().right, 
-//					dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
-//				); 
 				dad.frame.setVisible( true ); 
 				fsDevice.setFullScreenWindow( dad.frame ); 
 				
@@ -154,7 +155,7 @@ public class FullScreen extends FullScreenBase {
 				setResolution( 0, 0 ); 
 				
 				// Tell the sketch about the resolution change
-				Helper.notifySketch( dad ); 
+				notifySketch( dad ); 
 				
 				return; 
 			}
@@ -170,14 +171,13 @@ public class FullScreen extends FullScreenBase {
 			dad.frame.setVisible( true ); 
 			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
 			dad.frame.setSize(
-					dad.width + dad.frame.insets().left + dad.frame.insets().right, 
+				dad.width + dad.frame.insets().left + dad.frame.insets().right, 
 				dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
 			); 
 			dad.requestFocus(); 
-			System.out.println( "show" ); 
 	
 			// Tell the sketch about the resolution change
-			Helper.notifySketch( dad ); 
+			notifySketch( dad ); 
 			
 			return; 
 		}
@@ -262,4 +262,59 @@ public class FullScreen extends FullScreenBase {
 		this.refreshRate = rate; 
 	}
 	
+	/**
+	 * Get a list of available screen resolutions
+	 */
+	public Dimension[] getResolutions(){
+		DisplayMode modes[] = fsDevice.getDisplayModes();
+		
+		// count the number of different resolutions... 
+		int found = 0; 
+		Dimension resultTemp[] = new Dimension[modes.length]; 
+		for( int i = 0; i < modes.length; i++ ){
+			for( int j = i; j < modes.length; j++ ){
+				if(    modes[i].getWidth() != modes[j].getWidth() 
+					&& modes[i].getHeight() != modes[j].getHeight()
+					&& modes[i].getBitDepth() != 8 
+					&& modes[i].getBitDepth() != 16
+				){
+					// looks good! 
+					resultTemp[found] = new Dimension( modes[i].getWidth(), modes[i].getHeight() );
+					found ++; 
+					break; 
+				}
+			}
+		}
+		
+		Dimension result[] = new Dimension[found]; 
+		System.arraycopy( resultTemp, 0, result, 0, found );
+		
+		return result; 
+	}
+	
+	/**
+	 * Get a list of refresh rates available for a resolution
+	 */
+	public int[] getRefreshRates( int xRes, int yRes ){
+		DisplayMode modes[] = fsDevice.getDisplayModes(); 
+		int resultTemp[] = new int[modes.length]; 
+		int found = 0; 
+		
+		for( int i = 0; i < modes.length; i++ ){
+			if(    modes[i].getWidth() == xRes 
+			    && modes[i].getHeight() == yRes 
+			    && modes[i].getBitDepth() != 8 
+			    && modes[i].getBitDepth() != 16 
+			){
+				resultTemp[found] = modes[i].getRefreshRate(); 
+				found ++;
+			}
+		}
+		
+		int result[] = new int[found]; 
+		System.arraycopy( resultTemp, 0, result, 0, found );
+		
+		return result; 
+	}
+
 }
