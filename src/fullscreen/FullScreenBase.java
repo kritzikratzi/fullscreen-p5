@@ -6,7 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.URL;
+import java.lang.reflect.Method;
 
 import processing.core.GLFullScreenHelper;
 import processing.core.PApplet;
@@ -139,4 +139,18 @@ public abstract class FullScreenBase {
 			}
 		}
 	}
+	
+	/**
+	 * Notifies the sketch about a display mode change. 
+	 */
+	protected static void notifySketch( PApplet dad ){
+		try{
+			Method m = dad.getClass().getMethod( "displayChanged", new Class[]{ } );
+			m.invoke( dad, new Object[]{ } );
+		}
+		catch( Exception e ){
+			
+		}
+	}
+
 }
