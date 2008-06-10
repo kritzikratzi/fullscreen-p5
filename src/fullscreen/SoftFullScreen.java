@@ -25,6 +25,7 @@ import java.awt.Frame;
 import java.awt.GraphicsDevice;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 /**
  * FullScreen support for processing. 
@@ -83,8 +84,10 @@ public class SoftFullScreen extends FullScreenBase{
 		fsFrame.setUndecorated( true ); 
 		fsFrame.setBackground( Color.black ); 
 		fsFrame.setLayout( null ); 
-		//fsFrame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
-		fsFrame.setSize( dad.width, dad.height ); 
+		fsFrame.setSize( 
+			Math.max( fsDevice.getDisplayMode().getWidth(), dad.width ), 
+			Math.max( fsDevice.getDisplayMode().getHeight(), dad.height )
+		);
 		
 		registerFrame( fsFrame ); 
 	}
@@ -117,15 +120,6 @@ public class SoftFullScreen extends FullScreenBase{
 	 * @returns true on success
 	 */
 	public void setFullScreen( boolean fullScreen ){
-		// If it's called from setup we wait until the applet initialized properly
-		/*if( dad.frameCount == 0 && fullScreen == true ){
-			new FSWaitForInitThread().start(); 
-			
-			return; 
-		}*/
-		
-		
-		
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -134,18 +128,10 @@ public class SoftFullScreen extends FullScreenBase{
 			if( available() ){
 				// remove applet from processing frame and attach to fsFrame
 				fsFrame.setVisible( false );
-				/*dad.frame.setSize(
-					dad.width + dad.frame.insets().left + dad.frame.insets().right, 
-					dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
-				);*/
-				//fsFrame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
-				fsFrame.setSize( dad.width, dad.height ); 
-
-				
 				fsFrame.add( dad ); 
 				dad.requestFocus(); 
 				
-				if( dad.platform == dad.MACOSX ){
+				if( PApplet.platform == PConstants.MACOSX ){
 					new NativeOSX().setVisible( false ); 
 				}
 				
@@ -153,6 +139,7 @@ public class SoftFullScreen extends FullScreenBase{
 				fsFrame.setLocation( 0, 0 ); 
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 ); 
 				
+				notifySketch( dad ); 
 				return; 
 			}
 			else{
@@ -162,7 +149,6 @@ public class SoftFullScreen extends FullScreenBase{
 		}
 		else{
 			// remove applet from fsFrame and attach to processing frame
-			System.out.println( "hide" ); 
 			fsFrame.removeAll(); 
 			dad.frame.add( dad ); 
 			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
@@ -175,6 +161,7 @@ public class SoftFullScreen extends FullScreenBase{
 			fsFrame.setVisible( false ); 
 			dad.frame.setVisible( true ); 
 			dad.requestFocus(); 
+			notifySketch( dad ); 
 			
 			return; 
 		}
