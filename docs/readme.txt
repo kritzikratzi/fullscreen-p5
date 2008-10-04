@@ -7,7 +7,7 @@ combination with opengl. For examples, documentation and the latest version
 see http://www.superduper.org/processing/fullscreen_api/
 
   To install this drag the whole fullscreen folder into processing/libraries. 
-If you have <processing>/libraries/fullscreen/library/fullscreen.jar in place
+If you have <sketches>/libraries/fullscreen/library/fullscreen.jar in place
 after copying the folder over you did everything right. After relaunching 
 processing check if sketch > import has an item labeled fullscreen. That means
 everything is perfectly fine. Now copy and paste this code into processing 
@@ -47,7 +47,8 @@ void draw(){
 
 
   If you have any questions, suggestions or other trouble you can email me
-to it-didnt-work@superduper.org. 
+to it-didnt-work@superduper.org or contact me in the processing discourse 
+section (my username is hansi). 
 
 
   This software is released under the GPLv3, you should have received a copy of
