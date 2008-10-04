@@ -263,10 +263,17 @@ public class FullScreen extends FullScreenBase {
 	}
 	
 	/**
-	 * Get a list of available screen resolutions
+	 * List resolution for this screen
 	 */
 	public Dimension[] getResolutions(){
-		DisplayMode modes[] = fsDevice.getDisplayModes();
+		return getResolutions( fsDevice ); 
+	}
+	
+	/**
+	 * List resolutions for a graphics device
+	 */
+	public static Dimension[] getResolutions( GraphicsDevice device ){
+		DisplayMode modes[] = device.getDisplayModes();
 		
 		// count the number of different resolutions... 
 		int found = 0; 
@@ -290,6 +297,21 @@ public class FullScreen extends FullScreenBase {
 		System.arraycopy( resultTemp, 0, result, 0, found );
 		
 		return result; 
+	}
+	
+	/**
+	 * Get a list of available screen resolutions
+	 */
+	public static Dimension[] getResolutions( int screenNr ){
+		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+		if( screenNr >= devices.length ){
+			System.err.println( "FullScreen API: You requested the resolutions of screen nr. " + screenNr + ", " ); 
+			System.err.println( "however, there are only " + devices.length + " screens in your environment. " ); 
+			System.err.println( "Continuing with screen nr. 0" );
+			screenNr = 0; 
+		}
+		
+		return getResolutions( devices[screenNr] );  
 	}
 	
 	/**
