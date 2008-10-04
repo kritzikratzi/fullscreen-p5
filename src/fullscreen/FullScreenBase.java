@@ -35,7 +35,12 @@ public abstract class FullScreenBase {
 		dad.registerKeyEvent( this );
 		
 		// Make this sketch gl aware
-		GLFullScreenHelper.addOpenGLSupport( dad ); 
+		try{
+			GLFullScreenHelper.addOpenGLSupport( dad );
+		}
+		catch( Throwable t ){
+			t.printStackTrace(); 
+		}
 	}
 	
 	

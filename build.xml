@@ -21,7 +21,7 @@
 -->
 <project name="Processing Fullscreen API" default="dist">
 	<!-- path to the processing installation -->
-	<property name="sketch.path" value="${user.dir}/Documents/Processing"/>
+	<property name="sketch.path" value="${user.home}/Documents/Processing"/>
 	
 	<property name="version" value="0.95"/>
 	<fileset id="cp" includes="dependencies/*.jar"/>
@@ -106,7 +106,7 @@
 	
 	<!-- install the library, the processing folder (at the top) has to be specified! -->
 	<target name="install" depends="dist">
-		<unzip dest="${sketch.path}/libraries/fullscreen/">
+		<unzip dest="${sketch.path}/libraries/">
 			<fileset file="dist/fullscreen.zip"/>
 		</unzip>
 	</target>
