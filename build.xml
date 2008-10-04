@@ -21,7 +21,7 @@
 -->
 <project name="Processing Fullscreen API" default="dist">
 	<!-- path to the processing installation -->
-	<property name="processing.path" value="/Applications/Processing"/>
+	<property name="sketch.path" value="${user.dir}/Documents/Processing"/>
 	
 	<property name="version" value="0.95"/>
 	<fileset id="cp" includes="dependencies/*.jar"/>
@@ -43,35 +43,35 @@
 	<!-- create the files for the website -->
 	<target name="dist" depends="compile">
 		<mkdir dir="dist"/>
-		<mkdir dir="fs_api"/>
-		<mkdir dir="fs_api/library"/>
+		<mkdir dir="fullscreen"/>
+		<mkdir dir="fullscreen/library"/>
 		
 		<!-- copy documentation files -->
-		<copy todir="fs_api">
+		<copy todir="fullscreen">
 			<fileset dir="docs" excludes="**/.*"/>
 		</copy>
 		
 		<!-- copy native library files -->
-		<copy todir="fs_api/library/">
+		<copy todir="fullscreen/library/">
 			<fileset dir="lib"/>
 		</copy>
-		<copy todir="fs_api/examples">
+		<copy todir="fullscreen/examples">
 			<fileset dir="examples"/>
 		</copy>
 		
 		<!-- create the jar files and copy them over -->
-		<jar destfile="fs_api/library/fullscreen.jar" basedir="bin" includes="fullscreen/**"/>
-		<jar destfile="fs_api/library/fullscreen_GLsupport.jar" basedir="bin" includes="processing/**"/>
+		<jar destfile="fullscreen/library/fullscreen.jar" basedir="bin" includes="fullscreen/**"/>
+		<jar destfile="fullscreen/library/fullscreen_GLsupport.jar" basedir="bin" includes="processing/**"/>
 		
 		<!-- done, zip it up! -->
 		<zip destfile="dist/fullscreen.zip">
-			<fileset dir="fs_api" excludes="**/.*"/>
+			<fileset dir="." includes="fullscreen/**" excludes="**/.*"/>
 		</zip>
 		
 		<!-- for archiving purposes we also create a fs-xxx.zip -->
 		<copy file="dist/fullscreen.zip" tofile="dist/fullscreen-${version}.zip"/>
 		
-		<delete dir="fs_api"/>
+		<delete dir="fullscreen"/>
 		
 		<!-- - - - - - - - - - - - - - - -  -->
 		<!-- now create the source snapshot -->
@@ -106,7 +106,7 @@
 	
 	<!-- install the library, the processing folder (at the top) has to be specified! -->
 	<target name="install" depends="dist">
-		<unzip dest="${processing.path}/libraries/fullscreen/">
+		<unzip dest="${sketch.path}/libraries/fullscreen/">
 			<fileset file="dist/fullscreen.zip"/>
 		</unzip>
 	</target>
