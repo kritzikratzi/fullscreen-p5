@@ -24,8 +24,10 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 
+import processing.core.GLTextureUpdateHelper;
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.opengl.GLDrawableHelper;
 
 /**
  * FullScreen support for processing. 
@@ -120,6 +122,10 @@ public class SoftFullScreen extends FullScreenBase{
 	 * @returns true on success
 	 */
 	public void setFullScreen( boolean fullScreen ){
+		new DelayedModeChange( fullScreen );  
+	}
+	
+	public void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -139,7 +145,11 @@ public class SoftFullScreen extends FullScreenBase{
 				fsFrame.setLocation( 0, 0 ); 
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 ); 
 				
-				notifySketch( dad ); 
+				GLDrawableHelper.reAllocate( this ); 
+				GLTextureUpdateHelper.update( dad ); 
+				
+				notifySketch( dad );
+				
 				return; 
 			}
 			else{
@@ -174,5 +184,23 @@ public class SoftFullScreen extends FullScreenBase{
 		System.err.println( "Use the normal FullScreen mode to make use of that functionality.  " ); 
 	}
 
-
+	
+	public class DelayedModeChange{
+		private boolean state; 
+		private int skippedFrames = 0; 
+		
+		public DelayedModeChange( boolean state ){
+			this.state = state;
+			dad.registerPost( this ); 
+		}
+		
+		public void post(){
+			skippedFrames ++; 
+			
+			if( skippedFrames >= 2 ){
+				setFullScreenImpl( state );
+				dad.unregisterPost( this );
+			}
+		}
+	}
 }

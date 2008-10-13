@@ -8,7 +8,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 
-import processing.core.GLFullScreenHelper;
 import processing.core.PApplet;
 
 public abstract class FullScreenBase {
@@ -25,6 +24,9 @@ public abstract class FullScreenBase {
 	// The previous key event
 	static KeyEvent lastEvent = null;
 	
+	// Is opengl being used in this sketch? 
+	private boolean isGL; 
+	
 	/**
 	 * Create a fullscreen thingie
 	 */
@@ -33,13 +35,19 @@ public abstract class FullScreenBase {
 		
 		// Listen to processings key events
 		dad.registerKeyEvent( this );
-		
-		// Make this sketch gl aware
-		try{
-			GLFullScreenHelper.addOpenGLSupport( dad );
+
+		Class clazz = dad.g.getClass(); 
+		while( clazz != null  ){
+			if( clazz.getName().equals( "processing.opengl.PGraphicsOpenGL" ) )
+				isGL = true;
+			
+			clazz = clazz.getSuperclass(); 
 		}
-		catch( Throwable t ){
-			t.printStackTrace(); 
+		
+		if( isGL ){
+			// Make ppl aware that gl doesn't always work!
+			System.err.println( "FullScreen API: Warning, OPENGL Support is experimental! " ); 
+			System.err.println( "Keep checking http://www.superduper.org/processing/fullscreen_api/ for updates!" );
 		}
 	}
 	
@@ -158,4 +166,21 @@ public abstract class FullScreenBase {
 		}
 	}
 
+	/**
+	 * Is opengl somehow being used in this sketch? 
+	 */
+	public boolean isGL(){
+		return isGL;
+	}
+	
+	/**
+	 * Returns the sketch
+	 * 
+	 * @return
+	 */
+	public PApplet getSketch() {
+		return dad;
+	}
+
+	
 }

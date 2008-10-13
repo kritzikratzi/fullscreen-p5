@@ -23,7 +23,7 @@
 	<!-- path to the processing installation -->
 	<property name="sketch.path" value="${user.home}/Documents/Processing"/>
 	
-	<property name="version" value="0.95"/>
+	<property name="version" value="0.96"/>
 	<fileset id="cp" includes="dependencies/*.jar"/>
 	<path id="cp">
 		<fileset dir="." includes="dependencies/*.jar"/>
@@ -37,7 +37,7 @@
 	<!-- compile the sources, place the class files in the bin folder -->
 	<target name="compile">
 		<mkdir dir="bin"/>
-		<javac srcdir="src" destdir="bin" classpathref="cp" target="1.4" />
+		<javac srcdir="src" destdir="bin" classpathref="cp" target="1.5" />
 	</target>
 	
 	<!-- create the files for the website -->

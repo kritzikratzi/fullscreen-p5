@@ -20,12 +20,18 @@
 */
 package fullscreen;
 
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
+import processing.core.GLTextureUpdateHelper;
 import processing.core.PApplet;
+import processing.opengl.GLDrawableHelper;
+import processing.opengl.PGraphicsOpenGL;
 
 /**
  * FullScreen support for processing. 
@@ -72,10 +78,13 @@ public class FullScreen extends FullScreenBase {
 	boolean fsIsInitialized; 
 	
 	// Daddy...
-	PApplet dad;
+	private PApplet dad;
 	
 	// Refresh rate
 	private int refreshRate; 
+	
+	// A frame for going fullscreen
+	private Frame fsFrame; 
 	
 	/**
 	 * Create a new fullscreen object
@@ -83,6 +92,7 @@ public class FullScreen extends FullScreenBase {
 	public FullScreen( final PApplet dad, int screenNr ){
 		super( dad ); 
 		this.dad = dad; 
+
 		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		if( screenNr >= devices.length ){
 			System.err.println( "FullScreen API: You requested to use screen nr. " + screenNr + ", " ); 
@@ -92,8 +102,9 @@ public class FullScreen extends FullScreenBase {
 		}
 		
 		fsDevice = devices[screenNr]; 
-		
-		
+		fsFrame = new Frame(); 
+		fsFrame.setTitle( dad.frame.getTitle() ); 
+		fsFrame.setUndecorated( true ); 
 		if( dad.width > 0 ){
 			setResolution( dad.width, dad.height );
 		}
@@ -113,7 +124,7 @@ public class FullScreen extends FullScreenBase {
 	 * @returns true if so, yes if not
 	 */
 	public boolean isFullScreen(){
-		return fsDevice.getFullScreenWindow() == dad.frame; 
+		return fsDevice.getFullScreenWindow() == fsFrame; 
 	}
 	
 	
@@ -134,6 +145,13 @@ public class FullScreen extends FullScreenBase {
 	 * @returns true on success
 	 */
 	public void setFullScreen( boolean fullScreen ){
+		new DelayedModeChange( fullScreen ); 
+	}
+	
+	/** 
+	 * Don't use this! 
+	 */
+	public void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -142,44 +160,47 @@ public class FullScreen extends FullScreenBase {
 			// go to fullScreen mode...
 			
 			if( available() ){
-				// reshape frame and get it all excited about going fs
-				dad.frame.dispose(); 
-				dad.frame.setUndecorated( true ); 
-				dad.frame.setSize( fsDevice.getDisplayMode().getWidth(), fsDevice.getDisplayMode().getHeight() );
-				dad.frame.setVisible( true ); 
-				fsDevice.setFullScreenWindow( dad.frame ); 
-				
-				dad.requestFocus(); 
-				
-				// set default resolution...
+				dad.frame.setVisible( false );
+				dad.frame.remove( dad ); 
+				fsFrame.setVisible( true );
+				fsFrame.setLayout( null ); 
+				fsFrame.setSize( dad.width, dad.height ); 
+				fsFrame.add( dad ); 
+				fsDevice.setFullScreenWindow( fsFrame );
 				setResolution( 0, 0 ); 
 				
-				// Tell the sketch about the resolution change
-				notifySketch( dad ); 
+				dad.requestFocus();
+				dad.setLocation( 0, 0 );
 				
-				return; 
+				GLDrawableHelper.reAllocate( this );
+				GLTextureUpdateHelper.update( dad );
+				
+				// Tell the sketch about the resolution change
+				notifySketch( getSketch() ); 
 			}
 			else{
-				System.err.println( "FullScreen API: Fullscreen mode not available" ); 
-				return; 
+				System.err.println( "FullScreen API: Not available in applets. " ); 
 			}
 		}
 		else{
 			fsDevice.setFullScreenWindow( null );
-			dad.frame.dispose(); 
-			dad.frame.setUndecorated( false ); 
+			fsFrame.setVisible( false );
+			fsFrame.remove( dad );
+			
+			dad.frame.add( dad ); 
 			dad.frame.setVisible( true ); 
 			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
-			dad.frame.setSize(
+			/*dad.frame.setSize(
 				dad.width + dad.frame.insets().left + dad.frame.insets().right, 
 				dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
-			); 
+			);*/
 			dad.requestFocus(); 
 	
-			// Tell the sketch about the resolution change
-			notifySketch( dad ); 
+			GLDrawableHelper.reAllocate( this );
+			GLTextureUpdateHelper.update( dad );
 			
-			return; 
+			// Tell the sketch about the resolution change
+			notifySketch( getSketch() );
 		}
 	}
 	
@@ -208,7 +229,7 @@ public class FullScreen extends FullScreenBase {
 		
 		// Change resolution only if values are somehow meaningfull
 		if( fsResolutionX <= 0 || fsResolutionY <= 0 ){
-			dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
+			// dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
 			return; 
 		}
 		
@@ -216,7 +237,6 @@ public class FullScreen extends FullScreenBase {
 		DisplayMode theMode = null; 
 	
 		for( int i = 0; i < modes.length; i++ ){
-			
 			if( modes[ i ].getWidth() == fsResolutionX && modes[ i ].getHeight() == fsResolutionY ){
 				if( refreshRate == 0 || refreshRate == modes[i].getRefreshRate() ){
 					theMode = modes[ i ];
@@ -228,7 +248,7 @@ public class FullScreen extends FullScreenBase {
 		// Resolution not supported? 
 		if( theMode == null ){
 			System.err.println( "FullScreen API: Display mode not supported: " + fsResolutionX + "x" + fsResolutionY ); 
-			dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
+			// dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
 			return; 
 		}
 	
@@ -236,7 +256,7 @@ public class FullScreen extends FullScreenBase {
 		// Wait until we are in fullScreen exclusive mode..
 		try{
 			fsDevice.setDisplayMode( theMode ); 
-			dad.frame.setSize( fsResolutionX, fsResolutionY ); 
+			fsFrame.setSize( fsResolutionX, fsResolutionY ); 
 		}
 		catch( Exception e ){
 			System.err.println( "FullScreen API: Failed to go to fullScreen mode" ); 
@@ -244,7 +264,7 @@ public class FullScreen extends FullScreenBase {
 			return; 
 		}
 	
-		dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
+		dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 );
 	}
 	
 	
@@ -339,4 +359,22 @@ public class FullScreen extends FullScreenBase {
 		return result; 
 	}
 
+	public class DelayedModeChange{
+		private boolean state; 
+		private int skippedFrames = 0; 
+		
+		public DelayedModeChange( boolean state ){
+			this.state = state;
+			dad.registerPost( this ); 
+		}
+		
+		public void post(){
+			skippedFrames ++; 
+			
+			if( skippedFrames >= 2 ){
+				setFullScreenImpl( state );
+				dad.unregisterPost( this );
+			}
+		}
+	}
 }
