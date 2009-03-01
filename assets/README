@@ -1,0 +1,17 @@
+Build-Dependencies
+==================
+
+   Those files are needed for building the fullscreen api, they're not being 
+distributed with the library. All the files in this folder are distributed
+under the gpl. The sources can fetched from following sources: 
+
+
+core.jar, 
+opengl.jar:     Part of processing
+                http://www.processing.org
+                
+jogl.jar:       Part of Java-OpenGL, 
+                https://jogl.dev.java.net/
+
+stylesheet.css: Part of the processing-library-template project
+                http://code.google.com/p/processing-library-template/ 

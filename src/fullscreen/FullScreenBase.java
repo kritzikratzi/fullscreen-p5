@@ -10,6 +10,13 @@ import java.lang.reflect.Method;
 
 import processing.core.PApplet;
 
+
+/**
+ * The base class {@link FullScreen} and {@link SoftFullScreen} inherit from. <br /> 
+ * 
+ * It defines some common methods that you might wanna dig through (like {@link FullScreenBase#setShortcutsEnabled(boolean)})
+ * @author hansi
+ */
 public abstract class FullScreenBase {
 
 	// Our daddie
@@ -75,8 +82,6 @@ public abstract class FullScreenBase {
 
 	/**
 	 * Enters fullscreen mode
-	 * 
-	 * @returns true on success
 	 */
 	public void enter(){
 		setFullScreen( true ); 
@@ -85,8 +90,6 @@ public abstract class FullScreenBase {
 	
 	/**
 	 * Leaves fullscreen mode
-	 * 
-	 * @returns true on success
 	 */
 	public void leave(){
 		setFullScreen( false ); 
@@ -176,11 +179,9 @@ public abstract class FullScreenBase {
 	/**
 	 * Returns the sketch
 	 * 
-	 * @return
+	 * @return The Sketch associated with this object
 	 */
 	public PApplet getSketch() {
 		return dad;
 	}
-
-	
 }

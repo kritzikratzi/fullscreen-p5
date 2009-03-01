@@ -23,7 +23,8 @@ package fullscreen;
 
 
 /**
- * This class hides/shows the menubar on osx system. 
+ * This class dynamically hides/shows the menubar on osx systems.<br><br>
+ * You won't really need to use this directly.  
  * 
  * @author hansi
  */
@@ -37,5 +38,10 @@ public class NativeOSX {
     public NativeOSX() {
     }
 
-	native void setVisible( boolean arg ); 
+    /**
+     * Shows/Hides the menubar on osx
+     * 
+     * @param visibility True for show, false for hide. 
+     */
+	public native void setVisible( boolean visibility ); 
 }

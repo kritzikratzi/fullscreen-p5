@@ -1,7 +1,7 @@
 /*
   Part of the Processing Fullscreen API
 
-  Copyright (c) 2006-08 Hansi Raber
+  Copyright (c) 2006-09 Hansi Raber
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -21,7 +21,6 @@
 package fullscreen;
 
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Frame;
@@ -31,38 +30,23 @@ import java.awt.GraphicsEnvironment;
 import processing.core.GLTextureUpdateHelper;
 import processing.core.PApplet;
 import processing.opengl.GLDrawableHelper;
-import processing.opengl.PGraphicsOpenGL;
 
 /**
- * FullScreen support for processing. 
- * 
- * For a detailed reference see http://www.superduper.org/processing/fullscreen_api/
- * 
- * - setFullScreen( true | false ) 
- *   goes to / leaves fullscreen mode
- *
- * - setResolution( x, y ) 
- *   sets the resolution 
- * 
- * - createFullScreenKeyBindings() 
- *   links ctrl+f (or apple+f for macintosh) to enter/leave fullscreen mode
- *
- * WARNING: This package conflicts with the processing "present" option. If you want
- * fullscreen from the start use like this: 
- * 
- * void setup(){
- *   fs.setFullScreen( true );               // get fullscreen exclusive mode
- *   fs.setResolution( 640, 480 );           // change resolution to 640, 480
- * }
- * 
- * LIMITATIONS: 
- * - The size of the sketch can not be changed, when your sketch is
- *   smaller than the screen it will be centered. 
- * - The ESC key exits the sketch, this is processing standard. 
- * - Requires min. Java 1.4 to be installed work
- * - Only works for applications (not for applets)
- * 
- * by hansi, http://www.superduper.org,  http://www.fabrica.it
+ *  Creates a new fullscreen object. <br>
+ *  
+ *  This will use <a href="http://java.sun.com/docs/books/tutorial/extra/fullscreen/index.html" target="_blank">fullscreen exclusive mode</a>
+ *  to bring your sketch to the screen. <br>
+ *  The advantages are: 
+ *  
+ *  <ul>
+ *    <li>Notifications from your OS will not be on top of your sketch</li>
+ *    <li>The screensaver will be disabled automatically</li>
+ *  </ul>
+ *  
+ *  The drawbacks are: 
+ *  <ul>
+ *    <li>It's hard to use two screens</li>
+ *  </ul>
  */
 
 public class FullScreen extends FullScreenBase {
@@ -87,7 +71,10 @@ public class FullScreen extends FullScreenBase {
 	private Frame fsFrame; 
 	
 	/**
-	 * Create a new fullscreen object
+	 * Create a fullscreen object based on a specific screen
+	 * 
+	 * @param dad Your sketch
+	 * @param screenNr The screen number in a multi-monitor system. Counting starts at zero. 
 	 */
 	public FullScreen( final PApplet dad, int screenNr ){
 		super( dad ); 
@@ -111,7 +98,9 @@ public class FullScreen extends FullScreenBase {
 	}
 	
 	/**
-	 * Create a fullscreen object based on a specific screen
+	 * Create a new fullscreen object
+	 * 
+	 * @param dad Your sketch
 	 */
 	public FullScreen( PApplet dad ){
 		this( dad, 0 ); 
@@ -121,7 +110,7 @@ public class FullScreen extends FullScreenBase {
 	/**
 	 * Are we in FullScreen mode? 
 	 *
-	 * @returns true if so, yes if not
+	 * @return true if so, yes if not
 	 */
 	public boolean isFullScreen(){
 		return fsDevice.getFullScreenWindow() == fsFrame; 
@@ -131,7 +120,7 @@ public class FullScreen extends FullScreenBase {
 	/**
 	 * FullScreen is only available is applications, not in applets! 
 	 *
-	 * @returns true if fullScreen mode is available
+	 * @return true if fullScreen mode is available
 	 */
 	public boolean available(){
 		return dad.frame != null;
@@ -142,7 +131,6 @@ public class FullScreen extends FullScreenBase {
 	 * Enters/Leaves fullScreen mode. 
 	 *
 	 * @param fullScreen true or false
-	 * @returns true on success
 	 */
 	public void setFullScreen( boolean fullScreen ){
 		new DelayedModeChange( fullScreen ); 
@@ -151,7 +139,7 @@ public class FullScreen extends FullScreenBase {
 	/** 
 	 * Don't use this! 
 	 */
-	public void setFullScreenImpl( boolean fullScreen ){
+	private void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -211,8 +199,6 @@ public class FullScreen extends FullScreenBase {
 	 *
 	 * If you're not in fullscreen mode it memorizes the resolution and sets
 	 * it the next time you go in fullscreen mode
-	 *
-	 * @returns true if resolution change succeeded, false if not
 	 */
 	public void setResolution( int xRes, int yRes ){
 		if( xRes > 0 && yRes > 0 ){
@@ -359,6 +345,9 @@ public class FullScreen extends FullScreenBase {
 		return result; 
 	}
 
+	/**
+	 * A sweet little helper. 
+	 */
 	public class DelayedModeChange{
 		private boolean state; 
 		private int skippedFrames = 0; 

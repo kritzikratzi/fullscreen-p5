@@ -2,7 +2,7 @@
 <!--
   Part of the Processing Fullscreen API
 
-  Copyright (c) 2006-08 Hansi Raber
+  Copyright (c) 2006-09 Hansi Raber
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -20,94 +20,100 @@
   Boston, MA  02111-1307  USA
 -->
 <project name="Processing Fullscreen API" default="dist">
-	<!-- path to the processing installation -->
-	<property name="sketch.path" value="${user.home}/Documents/Processing"/>
+	<!-- path to the sketch folder -->
+	<property name="sketch.path" value="${user.home}/Documents/Processing" />
 	
-	<property name="version" value="0.96"/>
-	<fileset id="cp" includes="dependencies/*.jar"/>
+	<property name="version" value="0.97" />
+	<fileset id="cp" includes="assets/*.jar" />
 	<path id="cp">
-		<fileset dir="." includes="dependencies/*.jar"/>
+		<fileset dir="." includes="assets/*.jar" />
 	</path>
 	
 	<!-- empty the binary folder -->
 	<target name="clean">
-		<delete dir="bin"/>
+		<delete dir="bin" />
+		<delete dir="reference" />
 	</target>
-		
+	
+	
 	<!-- compile the sources, place the class files in the bin folder -->
-	<target name="compile">
-		<mkdir dir="bin"/>
+	<target name="compile" description="compile the sources">
+		<mkdir dir="bin" />
 		<javac srcdir="src" destdir="bin" classpathref="cp" target="1.5" />
 	</target>
 	
+	
+	<!-- create the reference -->
+	<target name="reference" depends="compile" description="generate reference">
+		<javadoc bottom="processing fullscreen api library by hansi, 2009. " 
+				 classpath="assets/processing-core.jar; bin" 
+				 destdir="reference" 
+				 verbose="false" 
+				 stylesheetfile="assets/stylesheet.css" 
+				 doctitle="Javadocs: Fullscreen API" 
+				 public="true" version="false" 
+				 windowtitle="Javadocs: Fullscreen API">
+			<fileset dir="src" includes="fullscreen/**/*.java" />
+		</javadoc>
+	</target>
+		
+		
 	<!-- create the files for the website -->
-	<target name="dist" depends="compile">
-		<mkdir dir="dist"/>
-		<mkdir dir="fullscreen"/>
-		<mkdir dir="fullscreen/library"/>
+	<target name="dist" depends="compile, reference" description="export library to the dist folder">
+		<mkdir dir="dist" />
+		<mkdir dir="fullscreen" />
+		<mkdir dir="fullscreen/library" />
+		<mkdir dir="fullscreen/reference" />
 		
 		<!-- copy documentation files -->
 		<copy todir="fullscreen">
-			<fileset dir="docs" excludes="**/.*"/>
+			<fileset dir="docs" excludes="**/.*" />
 		</copy>
 		
 		<!-- copy native library files -->
 		<copy todir="fullscreen/library/">
-			<fileset dir="lib"/>
+			<fileset dir="lib" />
 		</copy>
-		<copy todir="fullscreen/examples">
-			<fileset dir="examples"/>
+		<copy todir="fullscreen">
+			<fileset dir="." includes="examples/**, reference/**" />
 		</copy>
 		
 		<!-- create the jar files and copy them over -->
-		<jar destfile="fullscreen/library/fullscreen.jar" basedir="bin" includes="fullscreen/**"/>
-		<jar destfile="fullscreen/library/fullscreen_GLsupport.jar" basedir="bin" includes="processing/**"/>
+		<jar destfile="fullscreen/library/fullscreen.jar" basedir="bin" includes="fullscreen/**" />
+		<jar destfile="fullscreen/library/fullscreen_GLsupport.jar" basedir="bin" includes="processing/**" />
 		
 		<!-- done, zip it up! -->
 		<zip destfile="dist/fullscreen.zip">
-			<fileset dir="." includes="fullscreen/**" excludes="**/.*"/>
+			<fileset dir="." includes="fullscreen/**" excludes="**/.*" />
 		</zip>
 		
 		<!-- for archiving purposes we also create a fs-xxx.zip -->
-		<copy file="dist/fullscreen.zip" tofile="dist/fullscreen-${version}.zip"/>
+		<copy file="dist/fullscreen.zip" tofile="dist/fullscreen-${version}.zip" />
 		
-		<delete dir="fullscreen"/>
+		<delete dir="fullscreen" />
 		
 		<!-- - - - - - - - - - - - - - - -  -->
 		<!-- now create the source snapshot -->
-		<mkdir dir="fs_src"/>
+		<mkdir dir="fs_src" />
 		
-		<copy todir="fs_src/dependencies">
-			<fileset dir="dependencies"/>
+		<copy todir="fs_src">
+			<fileset dir="." includes="assets/**, examples/**, src/**, docs/**, lib/**" />
+			<fileset dir="." includes="build.xml, COPYING" />
 		</copy>
-		
-		<copy todir="fs_src/examples">
-			<fileset dir="examples"/>
-		</copy>
-		<copy todir="fs_src/src">
-			<fileset dir="src"/>
-		</copy>
-		<copy todir="fs_src/docs">
-			<fileset dir="docs"/>
-		</copy>
-		<copy todir="fs_src/lib">
-			<fileset dir="lib"/>
-		</copy>
-		<copy todir="fs_src/" file="build.xml"/>
-		<copy todir="fs_src/" file="COPYING"/>
 		
 		<zip destfile="dist/fullscreen-src.zip">
-			<fileset dir="fs_src" excludes="**/.*"/>
+			<fileset dir="fs_src" excludes="**/.*" />
 		</zip>
-		<copy file="dist/fullscreen-src.zip" tofile="dist/fullscreen-src-${version}.zip"/>
+		<copy file="dist/fullscreen-src.zip" tofile="dist/fullscreen-src-${version}.zip" />
 		
-		<delete dir="fs_src"/>
+		<delete dir="fs_src" />
 	</target>
 	
+	
 	<!-- install the library, the processing folder (at the top) has to be specified! -->
-	<target name="install" depends="dist">
+	<target name="install" depends="dist" description="install library to ${sketch.path}">
 		<unzip dest="${sketch.path}/libraries/">
-			<fileset file="dist/fullscreen.zip"/>
+			<fileset file="dist/fullscreen.zip" />
 		</unzip>
 	</target>
 </project>

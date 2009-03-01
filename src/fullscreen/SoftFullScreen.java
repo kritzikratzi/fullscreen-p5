@@ -30,35 +30,21 @@ import processing.core.PConstants;
 import processing.opengl.GLDrawableHelper;
 
 /**
- * FullScreen support for processing. 
- * 
- * For a detailed reference see http://www.superduper.org/processing/fullscreen_api/
- * 
- * - setFullScreen( true | false ) 
- *   goes to / leaves fullscreen mode
- *
- * - createFullScreenKeyBindings() 
- *   links ctrl+f (or apple+f for macintosh) to enter/leave fullscreen mode
- *
- * WARNING: This package conflicts with the processing "present" option. If you want
- * fullscreen from the start use like this: 
- * 
- * void setup(){
- *   fs.setFullScreen( true );               // get fullscreen exclusive mode
- *   fs.setResolution( 640, 480 );           // change resolution to 640, 480
- * }
- * 
- * LIMITATIONS: 
- * - The size of the sketch can not be changed, when your sketch is
- *   smaller than the screen it will be centered. 
- * - The ESC key exits the sketch, this is processing standard. 
- * - Requires min. Java 1.4 to be installed work
- * - Only works for applications (not for applets)
- * 
- * by hansi, http://www.superduper.org,  http://www.fabrica.it
- *
- *
- * TODO: Mouselisteners 
+ *  Creates a new softfullscreen object. <br>
+ *  
+ *  This will use undecorated frames to bring your sketch to the screen. <br>
+ *  The advantages are: 
+ *  
+ *  <ul>
+ *    <li>You can create a sketch that spans across multiple monitors easily</li>
+ *  </ul>
+ *  
+ *  The drawbacks are: 
+ *  <ul>
+ *    <li>You cannot change resolution</li>
+ *    <li>Screensaver must be disabled manually</li>
+ *    <li>Notifications and other kinds of annoying popups might just show up on top of your sketch</li>
+ *  </ul>
  */
 
 public class SoftFullScreen extends FullScreenBase{
@@ -77,7 +63,9 @@ public class SoftFullScreen extends FullScreenBase{
 	
 	
 	/**
-	 *  
+	 * Creates a new softfullscreen object. 
+	 * 
+	 * @param dad The parent sketch (aka "this")
 	 */
 	public SoftFullScreen( PApplet dad ){
 		super( dad ); 
@@ -98,7 +86,7 @@ public class SoftFullScreen extends FullScreenBase{
 	/**
 	 * Are we in FullScreen mode? 
 	 *
-	 * @returns true if so, yes if not
+	 * @return true if so, yes if not
 	 */
 	public boolean isFullScreen(){
 		return fsFrame.isVisible();  
@@ -108,7 +96,7 @@ public class SoftFullScreen extends FullScreenBase{
 	/**
 	 * FullScreen is only available is applications, not in applets! 
 	 *
-	 * @returns true if fullScreen mode is available
+	 * @return true if fullScreen mode is available
 	 */
 	public boolean available(){
 		return dad.frame != null;
@@ -119,13 +107,12 @@ public class SoftFullScreen extends FullScreenBase{
 	 * Enters/Leaves fullScreen mode. 
 	 *
 	 * @param fullScreen true or false
-	 * @returns true on success
 	 */
 	public void setFullScreen( boolean fullScreen ){
 		new DelayedModeChange( fullScreen );  
 	}
 	
-	public void setFullScreenImpl( boolean fullScreen ){
+	private void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -178,6 +165,9 @@ public class SoftFullScreen extends FullScreenBase{
 	}
 
 
+	/**
+	 * Setting resolution is not possible with the SoftFullScreen object. 
+	 */
 	@Override
 	public void setResolution( int xRes, int yRes ) {
 		System.err.println( "Changing resolution is not supported in SoftFullScreen mode. " ); 
@@ -185,6 +175,9 @@ public class SoftFullScreen extends FullScreenBase{
 	}
 
 	
+	/**
+	 * A sweet little helper. 
+	 */
 	public class DelayedModeChange{
 		private boolean state; 
 		private int skippedFrames = 0; 

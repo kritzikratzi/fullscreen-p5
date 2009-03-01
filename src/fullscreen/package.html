@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+	<head>
+	</head>
+<body bgcolor="white">
+
+Trying to bring better fullscreen support to processing.
+<br>
+
+<h2>Attention!</h2>
+This package conflicts with the processing <i>present</i> option.<br /> 
+If you want to go to fullscreen mode right away use this instead: 
+<pre>
+void setup(){
+  // .... 
+  fs.setResolution( 640, 480 );           // change resolution to 640, 480
+  fs.setFullScreen( true );               // get fullscreen exclusive mode
+}
+</pre>
+
+<h2>Limitations</h2>
+<ul>
+	<li>The size of the sketch can not be changed, when your sketch is
+	     smaller than the screen it will be centered. </li>
+	<li>The ESC key exits the sketch, this is processing standard.</li> 
+	<li>Requires min. Java 1.4 to be installed work</li>
+	<li>Only works for applications (not for applets)</li>
+</ul>
+
+<h2>Links</h2>
+Project home: <a href="http://www.superduper.org/processing/fullscreen_api" target="_blank">http://www.superduper.org/processing/fullscreen_api</a><br>
+Developer home: <a href="https://gna.org/projects/fullscreen-p5/" target="_blank">https://gna.org/projects/fullscreen-p5/</a>
+</body>
+</html>

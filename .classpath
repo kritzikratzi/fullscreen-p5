@@ -5,5 +5,8 @@
 	<classpathentry kind="lib" path="dependencies/processing-core.jar"/>
 	<classpathentry kind="lib" path="dependencies/processing-opengl.jar" sourcepath="/processing-head/opengl/src"/>
 	<classpathentry kind="lib" path="dependencies/jogl.jar"/>
+	<classpathentry kind="lib" path="assets/processing-opengl.jar"/>
+	<classpathentry kind="lib" path="assets/jogl.jar"/>
+	<classpathentry kind="lib" path="assets/processing-core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
