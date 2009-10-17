@@ -3,7 +3,7 @@ Build-Dependencies
 
    Those files are needed for building the fullscreen api, they're not being 
 distributed with the library. All the files in this folder are distributed
-under the gpl. The sources can fetched from following sources: 
+under the gpl. The sources can fetched from here: 
 
 
 core.jar, 

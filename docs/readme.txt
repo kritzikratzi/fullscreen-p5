@@ -1,4 +1,4 @@
-Fullscreen API for Processing, Version 0.96
+Fullscreen API for Processing, Version 0.98
 -------------------------------------------
 
   Thanks for download the Fullscreen API for Processing, this is still 

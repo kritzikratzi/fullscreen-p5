@@ -2,6 +2,7 @@
 import fullscreen.*; 
 
 FullScreen fs; 
+PImage img; 
 
 void setup(){
   // set size to 640x480
@@ -9,7 +10,8 @@ void setup(){
 
   // 5 fps
   frameRate(5);
-
+  img = loadImage( "test.png" ); 
+  
   // Create the fullscreen object
   fs = new FullScreen(this); 
   
@@ -33,4 +35,6 @@ void draw(){
       width - i*20, height - i*20
     );
   }
+  
+  image( img, 10, 10 ); 
 }

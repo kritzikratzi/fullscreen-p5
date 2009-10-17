@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 
 /**
@@ -43,7 +44,7 @@ public abstract class FullScreenBase {
 		// Listen to processings key events
 		dad.registerKeyEvent( this );
 
-		Class clazz = dad.g.getClass(); 
+		Class<?> clazz = dad.g.getClass(); 
 		while( clazz != null  ){
 			if( clazz.getName().equals( "processing.opengl.PGraphicsOpenGL" ) )
 				isGL = true;
@@ -148,8 +149,8 @@ public abstract class FullScreenBase {
 		
 		// catch the CMD+F combination (ALT+ENTER or CTRL+F for windows)
 		else if( e.getID() == KeyEvent.KEY_PRESSED ){
-			if( ( e.getKeyCode() == e.VK_F && e.getModifiers() == fsControlKey ) ||
-					( dad.platform == dad.WINDOWS && e.getKeyCode() == e.VK_ENTER && e.getModifiers() == e.VK_ALT ) ){
+			if( ( e.getKeyCode() == KeyEvent.VK_F && e.getModifiers() == fsControlKey ) ||
+					( PApplet.platform == PConstants.WINDOWS && e.getKeyCode() == KeyEvent.VK_ENTER && e.getModifiers() == KeyEvent.VK_ALT ) ){
 				// toggle fullscreen! 
 				setFullScreen( !isFullScreen() ); 
 			}

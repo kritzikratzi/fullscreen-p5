@@ -27,9 +27,7 @@ import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-import processing.core.GLTextureUpdateHelper;
 import processing.core.PApplet;
-import processing.opengl.GLDrawableHelper;
 
 /**
  *  Creates a new fullscreen object. <br>
@@ -139,6 +137,7 @@ public class FullScreen extends FullScreenBase {
 	/** 
 	 * Don't use this! 
 	 */
+	@SuppressWarnings("deprecation")
 	private void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
@@ -161,7 +160,7 @@ public class FullScreen extends FullScreenBase {
 				dad.setLocation( 0, 0 );
 				
 				GLDrawableHelper.reAllocate( this );
-				GLTextureUpdateHelper.update( dad );
+				GLTextureUpdateHelper.update( this );
 				
 				// Tell the sketch about the resolution change
 				notifySketch( getSketch() ); 
@@ -185,7 +184,7 @@ public class FullScreen extends FullScreenBase {
 			dad.requestFocus(); 
 	
 			GLDrawableHelper.reAllocate( this );
-			GLTextureUpdateHelper.update( dad );
+			GLTextureUpdateHelper.update( this );
 			
 			// Tell the sketch about the resolution change
 			notifySketch( getSketch() );

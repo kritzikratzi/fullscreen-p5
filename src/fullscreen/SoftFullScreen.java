@@ -24,10 +24,8 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 
-import processing.core.GLTextureUpdateHelper;
 import processing.core.PApplet;
 import processing.core.PConstants;
-import processing.opengl.GLDrawableHelper;
 
 /**
  *  Creates a new softfullscreen object. <br>
@@ -112,6 +110,7 @@ public class SoftFullScreen extends FullScreenBase{
 		new DelayedModeChange( fullScreen );  
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
@@ -133,7 +132,7 @@ public class SoftFullScreen extends FullScreenBase{
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 ); 
 				
 				GLDrawableHelper.reAllocate( this ); 
-				GLTextureUpdateHelper.update( dad ); 
+				GLTextureUpdateHelper.update( this ); 
 				
 				notifySketch( dad );
 				
@@ -151,13 +150,17 @@ public class SoftFullScreen extends FullScreenBase{
 			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
 			
 			// processing.core.fullscreen_texturehelper.update( dad );
-			if( dad.platform == dad.MACOSX ){
+			if( PApplet.platform == PConstants.MACOSX ){
 				new NativeOSX().setVisible( true );
 			}
 			
 			fsFrame.setVisible( false ); 
 			dad.frame.setVisible( true ); 
-			dad.requestFocus(); 
+			dad.requestFocus();
+			
+			GLDrawableHelper.reAllocate( this ); 
+			GLTextureUpdateHelper.update( this ); 
+			
 			notifySketch( dad ); 
 			
 			return; 

@@ -23,7 +23,7 @@
 	<!-- path to the sketch folder -->
 	<property name="sketch.path" value="${user.home}/Documents/Processing" />
 	
-	<property name="version" value="0.97" />
+	<property name="version" value="0.98" />
 	<fileset id="cp" includes="assets/*.jar" />
 	<path id="cp">
 		<fileset dir="." includes="assets/*.jar" />
@@ -53,6 +53,8 @@
 				 doctitle="Javadocs: Fullscreen API" 
 				 public="true" version="false" 
 				 windowtitle="Javadocs: Fullscreen API">
+			<link href="http://java.sun.com/javase/6/docs/api" />
+			<link href="http://dev.processing.org/reference/everything/javadoc/" />
 			<fileset dir="src" includes="fullscreen/**/*.java" />
 		</javadoc>
 	</target>
