@@ -82,7 +82,6 @@
 		
 		<!-- create the jar files and copy them over -->
 		<jar destfile="fullscreen/library/fullscreen.jar" basedir="bin" includes="fullscreen/**" />
-		<jar destfile="fullscreen/library/fullscreen_GLsupport.jar" basedir="bin" includes="processing/**" />
 		
 		<!-- done, zip it up! -->
 		<zip destfile="dist/fullscreen.zip">
