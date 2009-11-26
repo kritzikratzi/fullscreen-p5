@@ -21,6 +21,7 @@
 package fullscreen;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Frame;
@@ -90,6 +91,7 @@ public class FullScreen extends FullScreenBase {
 		fsFrame = new Frame(); 
 		fsFrame.setTitle( dad.frame.getTitle() ); 
 		fsFrame.setUndecorated( true ); 
+		fsFrame.setBackground( Color.black ); 
 		if( dad.width > 0 ){
 			setResolution( dad.width, dad.height );
 		}
@@ -157,7 +159,7 @@ public class FullScreen extends FullScreenBase {
 				setResolution( 0, 0 ); 
 				
 				dad.requestFocus();
-				dad.setLocation( 0, 0 );
+				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 );
 				
 				GLDrawableHelper.reAllocate( this );
 				GLTextureUpdateHelper.update( this );

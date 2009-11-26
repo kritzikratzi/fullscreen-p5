@@ -20,9 +20,12 @@
 */
 package fullscreen;
 
+import japplemenubar.JAppleMenuBar;
+
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -48,7 +51,7 @@ import processing.core.PConstants;
 public class SoftFullScreen extends FullScreenBase{
 	// We use this frame to go to fullScreen mode...
 	Frame fsFrame = new Frame(); 
-	GraphicsDevice fsDevice = fsFrame.getGraphicsConfiguration().getDevice();
+	GraphicsDevice fsDevice;
 	
 	//AWTEventListener fsKeyListener;
 	
@@ -59,15 +62,35 @@ public class SoftFullScreen extends FullScreenBase{
 	PApplet dad; 
 	
 	
-	
 	/**
 	 * Creates a new softfullscreen object. 
 	 * 
 	 * @param dad The parent sketch (aka "this")
 	 */
 	public SoftFullScreen( PApplet dad ){
+		this( dad, 0 ); 
+	}
+	
+	/**
+	 * Creates a new softfullscreen object on a specific screen 
+	 * (numbering starts at 0)
+	 * 
+	 * @param dad The parent sketch (usually "this")
+	 * @param screenNr The screen number. 
+	 */
+	public SoftFullScreen( PApplet dad, int screenNr ){
 		super( dad ); 
-		this.dad = dad; 
+		this.dad = dad;
+		
+		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+		if( screenNr >= devices.length ){
+			System.err.println( "FullScreen API: You requested to use screen nr. " + screenNr + ", " ); 
+			System.err.println( "however, there are only " + devices.length + " screens in your environment. " ); 
+			System.err.println( "Continuing with screen nr. 0" );
+			screenNr = 0; 
+		}
+		
+		fsDevice = devices[screenNr]; 
 		fsFrame.setTitle( "FullScreen" ); 
 		fsFrame.setUndecorated( true ); 
 		fsFrame.setBackground( Color.black ); 
@@ -79,7 +102,6 @@ public class SoftFullScreen extends FullScreenBase{
 		
 		registerFrame( fsFrame ); 
 	}
-	
 	
 	/**
 	 * Are we in FullScreen mode? 
@@ -119,16 +141,16 @@ public class SoftFullScreen extends FullScreenBase{
 		else if( fullScreen ){
 			if( available() ){
 				// remove applet from processing frame and attach to fsFrame
-				fsFrame.setVisible( false );
+				dad.frame.setVisible( false ); 
 				fsFrame.add( dad ); 
 				dad.requestFocus(); 
 				
 				if( PApplet.platform == PConstants.MACOSX ){
-					new NativeOSX().setVisible( false ); 
+					new JAppleMenuBar().setVisible( false ); 
 				}
 				
 				fsFrame.setVisible( true ); 
-				fsFrame.setLocation( 0, 0 ); 
+				fsFrame.setLocation( fsDevice.getDefaultConfiguration().getBounds().getLocation() );
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 ); 
 				
 				GLDrawableHelper.reAllocate( this ); 
@@ -145,16 +167,16 @@ public class SoftFullScreen extends FullScreenBase{
 		}
 		else{
 			// remove applet from fsFrame and attach to processing frame
+			fsFrame.setVisible( false ); 
 			fsFrame.removeAll(); 
 			dad.frame.add( dad ); 
 			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
 			
 			// processing.core.fullscreen_texturehelper.update( dad );
 			if( PApplet.platform == PConstants.MACOSX ){
-				new NativeOSX().setVisible( true );
+				new JAppleMenuBar().setVisible( true );
 			}
 			
-			fsFrame.setVisible( false ); 
 			dad.frame.setVisible( true ); 
 			dad.requestFocus();
 			

@@ -24,9 +24,9 @@
 	<property name="sketch.path" value="${user.home}/Documents/Processing" />
 	
 	<property name="version" value="0.98" />
-	<fileset id="cp" includes="assets/*.jar" />
+	<fileset id="cp" includes="dependencies/*.jar" />
 	<path id="cp">
-		<fileset dir="." includes="assets/*.jar" />
+		<fileset dir="." includes="dependencies/*.jar" />
 	</path>
 	
 	<!-- empty the binary folder -->
@@ -46,10 +46,10 @@
 	<!-- create the reference -->
 	<target name="reference" depends="compile" description="generate reference">
 		<javadoc bottom="processing fullscreen api library by hansi, 2009. " 
-				 classpath="assets/processing-core.jar; bin" 
+				 classpath="dependencies/processing-core.jar; bin" 
 				 destdir="reference" 
 				 verbose="false" 
-				 stylesheetfile="assets/stylesheet.css" 
+				 stylesheetfile="dependencies/stylesheet.css" 
 				 doctitle="Javadocs: Fullscreen API" 
 				 public="true" version="false" 
 				 windowtitle="Javadocs: Fullscreen API">
@@ -98,7 +98,7 @@
 		<mkdir dir="fs_src" />
 		
 		<copy todir="fs_src">
-			<fileset dir="." includes="assets/**, examples/**, src/**, docs/**, lib/**" />
+			<fileset dir="." includes="dependencies/**, examples/**, src/**, docs/**, lib/**" />
 			<fileset dir="." includes="build.xml, COPYING" />
 		</copy>
 		
