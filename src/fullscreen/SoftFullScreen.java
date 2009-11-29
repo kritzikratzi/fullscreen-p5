@@ -103,6 +103,10 @@ public class SoftFullScreen extends FullScreenBase{
 		registerFrame( fsFrame ); 
 	}
 	
+	public SoftFullScreen( PApplet dad, int screen1X, int screen2X, int ... screensXY ){
+		super( dad );
+	}
+	
 	/**
 	 * Are we in FullScreen mode? 
 	 *

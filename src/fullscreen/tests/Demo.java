@@ -49,7 +49,7 @@ public class Demo{
 	 * This is a PApplet that actually launches itself when instantized.
 	 * (That means no trouble with the main-method...)  
 	 */
-	private static class LaunchablePApplet extends PApplet{
+	public static class LaunchablePApplet extends PApplet{
 		private static final long serialVersionUID = 1L;
 
 		public LaunchablePApplet(){
