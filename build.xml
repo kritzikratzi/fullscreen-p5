@@ -23,7 +23,7 @@
 	<!-- path to the sketch folder -->
 	<property name="sketch.path" value="${user.home}/Documents/Processing" />
 	
-	<property name="version" value="0.98.1" />
+	<property name="version" value="0.98.2" />
 	<fileset id="cp" includes="dependencies/*.jar" />
 	<path id="cp">
 		<fileset dir="." includes="dependencies/*.jar" />
@@ -39,7 +39,7 @@
 	<!-- compile the sources, place the class files in the bin folder -->
 	<target name="compile" description="compile the sources">
 		<mkdir dir="bin" />
-		<javac srcdir="src" destdir="bin" classpathref="cp" target="1.5" />
+		<javac srcdir="src" destdir="bin" classpathref="cp" target="1.5" debug="yes" debuglevel="lines,vars,source"/>
 	</target>
 	
 	
@@ -81,7 +81,7 @@
 		</copy>
 		
 		<!-- create the jar files and copy them over -->
-		<jar destfile="fullscreen/library/fullscreen.jar" basedir="bin" includes="fullscreen/**" excludes="fullscreen/tests/**" />
+		<jar destfile="fullscreen/library/fullscreen.jar" basedir="bin" includes="fullscreen/** japplemenubar/**" excludes="fullscreen/tests/**" />
 		
 		<!-- done, zip it up! -->
 		<zip destfile="dist/fullscreen.zip">
@@ -108,6 +108,17 @@
 		<copy file="dist/fullscreen-src.zip" tofile="dist/fullscreen-src-${version}.zip" />
 		
 		<delete dir="fs_src" />
+	</target>
+	
+	<!-- run unit tests -->
+	<target name="test" depends="compile" description="Run unit tests">
+		<junit printsummary="yes" showoutput="yes" fork="yes">
+			<formatter type="plain"/>
+			<classpath refid="cp" />
+			<classpath location="bin" />
+			<jvmarg value="-Djava.library.path=lib"/>
+			<test name="fullscreen.tests.Tests"/>
+		</junit>
 	</target>
 	
 	

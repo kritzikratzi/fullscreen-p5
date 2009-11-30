@@ -15,3 +15,6 @@ jogl.jar:       Part of Java-OpenGL,
 
 stylesheet.css: Part of the processing-library-template project
                 http://code.google.com/p/processing-library-template/ 
+                
+junit-4.7.jar:  JUnit Testing Framework
+				http://www.junit.org

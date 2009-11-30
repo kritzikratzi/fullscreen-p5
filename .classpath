@@ -4,7 +4,7 @@
 	<classpathentry kind="lib" path="dependencies/jogl.jar"/>
 	<classpathentry kind="lib" path="dependencies/processing-core.jar"/>
 	<classpathentry kind="lib" path="dependencies/processing-opengl.jar"/>
+	<classpathentry kind="lib" path="dependencies/junit-4.7.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
