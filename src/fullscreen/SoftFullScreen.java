@@ -22,10 +22,9 @@ package fullscreen;
 
 import japplemenubar.JAppleMenuBar;
 
-import java.awt.Color;
-import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+import java.util.Vector;
+
+import javax.swing.JFrame;
 
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -50,9 +49,6 @@ import processing.core.PConstants;
 
 public class SoftFullScreen extends FullScreenBase{
 	// We use this frame to go to fullScreen mode...
-	Frame fsFrame = new Frame(); 
-	GraphicsDevice fsDevice;
-	
 	//AWTEventListener fsKeyListener;
 	
 	// the first time wait until the frame is displayed
@@ -61,6 +57,8 @@ public class SoftFullScreen extends FullScreenBase{
 	// Daddy...
 	PApplet dad; 
 	
+	private boolean isFullScreen = false; 
+	Vector<FullScreenFrame> frames = new Vector<FullScreenFrame>(); 
 	
 	/**
 	 * Creates a new softfullscreen object. 
@@ -81,31 +79,40 @@ public class SoftFullScreen extends FullScreenBase{
 	public SoftFullScreen( PApplet dad, int screenNr ){
 		super( dad ); 
 		this.dad = dad;
-		
-		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		if( screenNr >= devices.length ){
-			System.err.println( "FullScreen API: You requested to use screen nr. " + screenNr + ", " ); 
-			System.err.println( "however, there are only " + devices.length + " screens in your environment. " ); 
-			System.err.println( "Continuing with screen nr. 0" );
-			screenNr = 0; 
-		}
-		
-		fsDevice = devices[screenNr]; 
-		fsFrame.setTitle( "FullScreen" ); 
-		fsFrame.setUndecorated( true ); 
-		fsFrame.setBackground( Color.black ); 
-		fsFrame.setLayout( null ); 
-		fsFrame.setSize( 
-			Math.max( fsDevice.getDisplayMode().getWidth(), dad.width ), 
-			Math.max( fsDevice.getDisplayMode().getHeight(), dad.height )
-		);
-		
-		registerFrame( fsFrame ); 
 	}
 	
-	public SoftFullScreen( PApplet dad, int screen1X, int screen2X, int ... screensXY ){
-		super( dad );
+	/**
+	 * Sets the crop-regions...
+	 * @param numbers screen 1, x1, y1, width1, height1, screen 2, x2, y2, width2, height2, etc.   
+	 */
+	public void setScreens( int ... numbers ){
+		if( numbers.length % 5 != 0 ){
+			System.err.println( "FullScreen API: You defined the screen-regions, but the input format doesn't match. " );
+			System.err.println( "Use like this: " ); 
+			System.err.println( "fs.setScreens( screen-nr1, x1, y1, width1, height1, screen-nr2, width2, height2" );
+			System.err.println( "" ); 
+			System.err.println( "e.g. fs.setScreens( 0, 0, 0, 800, 600 ); // applet on screen 0" ); 
+			System.err.println( "e.g. fs.setScreens( 1, 0, 0, 800, 600 ); // applet on screen 1" ); 
+			System.err.println( "e.g. fs.setScreens( 0, 0, 0, 400, 600,  1, 400, 0, 400, 600 ); // half on screen 0, half on screen 1" ); 
+			System.err.println( "" );
+			System.err.println( "Your call is ignored, please fix this! " ); 
+			return; 
+		}
+		
+		frames.clear(); 
+		for( int i = 0; i < numbers.length; i += 5 ){
+			int screenNr = numbers[i]; 
+			int x = numbers[i+1]; 
+			int y = numbers[i+2]; 
+			int width = numbers[i+3]; 
+			int height = numbers[i+4];
+			
+			FullScreenFrame frame = new FullScreenFrame(dad, screenNr, x, y, width, height );
+			registerFrame( frame ); 
+			frames.add( frame ); 
+		}
 	}
+	
 	
 	/**
 	 * Are we in FullScreen mode? 
@@ -113,7 +120,7 @@ public class SoftFullScreen extends FullScreenBase{
 	 * @return true if so, yes if not
 	 */
 	public boolean isFullScreen(){
-		return fsFrame.isVisible();  
+		return isFullScreen; 
 	}
 	
 	
@@ -136,6 +143,7 @@ public class SoftFullScreen extends FullScreenBase{
 		new DelayedModeChange( fullScreen );  
 	}
 	
+	
 	@SuppressWarnings("deprecation")
 	private void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
@@ -145,23 +153,22 @@ public class SoftFullScreen extends FullScreenBase{
 		else if( fullScreen ){
 			if( available() ){
 				// remove applet from processing frame and attach to fsFrame
-				dad.frame.setVisible( false ); 
-				fsFrame.add( dad ); 
-				dad.requestFocus(); 
+				dad.frame.setVisible( false );  
 				
 				if( PApplet.platform == PConstants.MACOSX ){
-					new JAppleMenuBar().setVisible( false ); 
+					new JAppleMenuBar().setVisible( false );
 				}
 				
-				fsFrame.setVisible( true ); 
-				fsFrame.setLocation( fsDevice.getDefaultConfiguration().getBounds().getLocation() );
-				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 ); 
+				for( JFrame frame : frames ){
+					frame.setVisible( true ); 
+					frame.requestFocus(); 
+				}
 				
-				GLDrawableHelper.reAllocate( this ); 
-				GLTextureUpdateHelper.update( this ); 
+				//GLDrawableHelper.reAllocate( this ); 
+				//GLTextureUpdateHelper.update( this ); 
 				
 				notifySketch( dad );
-				
+				isFullScreen = true; 
 				return; 
 			}
 			else{
@@ -171,23 +178,24 @@ public class SoftFullScreen extends FullScreenBase{
 		}
 		else{
 			// remove applet from fsFrame and attach to processing frame
-			fsFrame.setVisible( false ); 
-			fsFrame.removeAll(); 
-			dad.frame.add( dad ); 
-			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
+			for( JFrame frame : frames ){
+				frame.setVisible( false ); 
+			}
+			
+			dad.frame.setVisible( true ); 
+			dad.requestFocus();
 			
 			// processing.core.fullscreen_texturehelper.update( dad );
 			if( PApplet.platform == PConstants.MACOSX ){
 				new JAppleMenuBar().setVisible( true );
 			}
 			
-			dad.frame.setVisible( true ); 
-			dad.requestFocus();
 			
-			GLDrawableHelper.reAllocate( this ); 
-			GLTextureUpdateHelper.update( this ); 
+			//GLDrawableHelper.reAllocate( this ); 
+			//GLTextureUpdateHelper.update( this ); 
 			
 			notifySketch( dad ); 
+			isFullScreen = false; 
 			
 			return; 
 		}

@@ -44,6 +44,7 @@ public abstract class FullScreenBase {
 		// Listen to processings key events
 		dad.registerKeyEvent( this );
 
+		// See if the graphics object somehow inherits from PGraphicsOpenGL
 		Class<?> clazz = dad.g.getClass(); 
 		while( clazz != null  ){
 			if( clazz.getName().equals( "processing.opengl.PGraphicsOpenGL" ) )

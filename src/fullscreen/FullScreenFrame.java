@@ -1,70 +1,81 @@
-package fullscreen.tests;
+package fullscreen;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.GraphicsDevice;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferStrategy;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import processing.core.PApplet;
 
-import fullscreen.SoftFullScreen;
-
-public class TemporaryGaga {
-
-	public static class SplitApplet extends Demo.LaunchablePApplet{
+public class FullScreenFrame extends JFrame{
+	private static final long serialVersionUID = 1L;
+	
+	// The original sketch
+	private PApplet dad; 
+	
+	// And the painter
+	private FullScreenPainter painter; 
+	
+	// Active? 
+	private boolean active = false; 
 		
-		SoftFullScreen fs; 
+	/**
+	 * Creates a fullscreen-frame thing. 
+	 * 
+	 * @param dad The original sketch
+	 */
+	public FullScreenFrame( PApplet dad, int screenNr, int x, int y, int width, int height ){
+		this.dad = dad;
+		painter = new FullScreenPainter( dad, x, y, width, height );
+		getContentPane().add( painter, BorderLayout.CENTER );
 		
-		public void setup(){
-			size( 800, 600 ); 
-		}
+		GraphicsDevice device = FullScreenTools.getScreenDevice( screenNr ); 
+		setBounds( device.getDefaultConfiguration().getBounds() );
 		
-		
-		public void draw(){
-			background( 127 );
-			fill( 255 ); 
-			rect( 10, 10, width-20, height-20 ); 
-			ellipse( mouseX, mouseY, 20, 20 ); 
-		}
-		
+		setUndecorated( true );
+		setVisible( false ); 
 	}
 	
-	public static void main( String args[]){
-		/*JFrame frame; 
-		frame = new JFrame(); 
-		frame.setVisible( true ); 
-		
-		PApplet dad = new SplitApplet();
-		frame.getContentPane().add( new PAppletPart( dad, 0, 0, 400, 400 ), BorderLayout.CENTER ); 
-		frame.pack(); 
-		dad.frame.setVisible( true );*/
-		PApplet dad = new SplitApplet(); 
-		SoftFullScreen fs = new SoftFullScreen( dad );
-		fs.setScreens( 
-			0, 0, 0, 400, 600, 
-			1, 400, 0, 400, 600 
-		);
+	@Override
+	public void setVisible( boolean visible ){
+		super.setVisible( visible );
+		active = visible; 
+	}
+
+	@Override
+	public void requestFocus() {
+		painter.requestFocus(); 
 	}
 	
-	public static class PAppletPart extends JComponent{
+	/**
+	 * The thing that takes care of painting the sketch when in fullscreen mode  
+	 * 
+	 * @author hansi
+	 */
+	public class FullScreenPainter extends JComponent{
+		private static final long serialVersionUID = 1L;
+
+		// The region this thing takes care for 
 		private int width, height, x, y; 
+		
+		// The original sketch
 		private PApplet dad; 
 		
 		// where is the sketch position? 
 		private int sketchX = 0; 
-		private int sketchY = 0; 
+		private int sketchY = 0;
 		
-		public PAppletPart( final PApplet dad, int x,int y, int width, int height ){
+		public FullScreenPainter( final PApplet dad, int x,int y, int width, int height ){
 			dad.registerDraw( this );
 			dad.registerPre( this ); 
 			dad.registerPost( this ); 
@@ -112,6 +123,22 @@ public class TemporaryGaga {
 					if( ( e = duplicate( e ) ) != null ) dad.mouseReleased( e ); 
 				}
 			}); 
+			addKeyListener( new KeyListener(){
+				@Override
+				public void keyPressed(KeyEvent e) {
+					dad.keyPressed( e ); 
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					dad.keyReleased( e ); 
+				}
+
+				@Override
+				public void keyTyped(KeyEvent e) {
+					dad.keyTyped( e ); 
+				}
+			}); 
 		}
 		
 		
@@ -119,7 +146,7 @@ public class TemporaryGaga {
 		 * Duplicates a mouse event, but only if necessary!  
 		 * @return 
 		 */
-		public MouseEvent duplicate( MouseEvent e ){
+		private MouseEvent duplicate( MouseEvent e ){
 			if( 
 				e.getX() >= sketchX && e.getX() <= sketchX + width && 
 				e.getY() >= sketchY && e.getY() <= sketchY + height 
@@ -130,8 +157,8 @@ public class TemporaryGaga {
 					e.getID(), 
 					e.getWhen(), 
 					e.getModifiers(), 
-					e.getX() - sketchX, 
-					e.getY() - sketchY, 
+					e.getX() - sketchX + x, 
+					e.getY() - sketchY + y, 
 					e.getXOnScreen(), 
 					e.getYOnScreen(), 
 					e.getClickCount(), 
@@ -148,17 +175,18 @@ public class TemporaryGaga {
 		/**
 		 * Before draw
 		 */
-		private Image xy = null;
 		public void pre(){
-			xy = dad.g.image == null? xy:dad.g.image; 
-			dad.g.image = null; 
+			/*if( active ){
+				sketchImage = dad.g.image == null? sketchImage:dad.g.image; 
+				dad.g.image = null;
+			}*/
 		}
 		
 		/**
 		 * After draw... 
 		 */
 		public void post(){
-			dad.g.image = xy == null? dad.g.image : xy; 
+			/*dad.g.image = sketchImage == null? dad.g.image : sketchImage;*/ 
 		}
 		
 		
@@ -186,8 +214,8 @@ public class TemporaryGaga {
 				// g.setClip( sketchX, sketchY, width, height ); 
 				// g.drawImage( dad.g.image, sketchX - x, sketchY - y, null );
 				
-				// fast? 
-				g.drawImage( xy, 
+				// faster? 
+				g.drawImage( dad.g.image, 
 					sketchX, sketchY, // destination point 1
 					sketchX + width, sketchY + height, // destination point 2
 					x, y, // source point 1
@@ -217,3 +245,4 @@ public class TemporaryGaga {
 		
 	}
 }
+
