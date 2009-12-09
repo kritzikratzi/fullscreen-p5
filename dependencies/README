@@ -6,15 +6,15 @@ distributed with the library. All the files in this folder are distributed
 under the gpl. The sources can fetched from here: 
 
 
-core.jar, 
-opengl.jar:     Part of processing
-                http://www.processing.org
+core.jar,		 
+opengl/opengl.jar: Part of processing
+                   http://www.processing.org
                 
-jogl.jar:       Part of Java-OpenGL, 
-                https://jogl.dev.java.net/
+opengl/*:          Part of Java-OpenGL, 
+                   https://jogl.dev.java.net/
 
-stylesheet.css: Part of the processing-library-template project
-                http://code.google.com/p/processing-library-template/ 
+stylesheet.css:    Part of the processing-library-template project
+                   http://code.google.com/p/processing-library-template/ 
                 
-junit-4.7.jar:  JUnit Testing Framework
-				http://www.junit.org
+junit-4.7.jar:     JUnit Testing Framework
+				   http://www.junit.org

@@ -21,16 +21,40 @@ public class Demo{
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * This is a simple Sketch using the JAVA-2D renderer
+	 * This is a simple Sketch
 	 * @author hansi
-	 *
 	 */
 	public static class Simple extends LaunchablePApplet{
 		private static final long serialVersionUID = 1L;
 
+		// Which renderer should we use? 
+		private final String renderThing;
+		
+		// What size do we want? 
+		private final int w, h; 
+		
+		/**
+		 * Creates the simple sketch using the JAVA2D renderer
+		 */
+		public Simple(){
+			this( 800, 600, JAVA2D );
+		}
+		
+		/**
+		 * Creates a simple sketch using a special renderer
+		 */
+		public Simple( int width, int height, String renderer ){
+			super( false ); 
+			this.renderThing = renderer; 
+			this.w = width; 
+			this.h = height;
+			
+			startPApplet();
+		}
+		
 		@Override
 		public void setup(){
-			size( 400, 400 ); 
+			size( w, h, renderThing ); 
 		}
 		
 		@Override
@@ -45,6 +69,7 @@ public class Demo{
 		
 	}
 
+	
 	/**
 	 * This is a PApplet that actually launches itself when instantized.
 	 * (That means no trouble with the main-method...)  
@@ -53,6 +78,16 @@ public class Demo{
 		private static final long serialVersionUID = 1L;
 
 		public LaunchablePApplet(){
+			this( true ); 
+		}
+		
+		public LaunchablePApplet( boolean autostart ){
+			if( autostart ){
+				startPApplet(); 
+			}
+		}
+			
+		public void startPApplet(){
 			// Disable abyssmally slow Sun renderer on OS X 10.5.
 			if ( PApplet.platform == PApplet.MACOSX ){
 				// Only run this on OS X otherwise it can cause a permissions error.
@@ -141,8 +176,8 @@ public class Demo{
 			if (this.displayable()) {
 				frame.setVisible(true);
 			}
-		this.requestFocus(); // ask for keydowns
-		//System.out.println("exiting main()");
+			this.requestFocus(); // ask for keydowns
+			//System.out.println("exiting main()");
+		}
 	}
-}
 }

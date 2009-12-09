@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import processing.core.PApplet;
+import processing.opengl.PGraphicsOpenGL;
 
 public class FullScreenFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
@@ -40,9 +41,11 @@ public class FullScreenFrame extends JFrame{
 		getContentPane().add( painter, BorderLayout.CENTER );
 		
 		GraphicsDevice device = FullScreenTools.getScreenDevice( screenNr ); 
-		setBounds( device.getDefaultConfiguration().getBounds() );
-		
-		setUndecorated( true );
+		//setBounds( device.getDefaultConfiguration().getBounds() );
+		setLocation( 0, 0 );
+		pack(); 
+		setTitle( "K" ); 
+		//setUndecorated( true );
 		setVisible( false ); 
 	}
 	
@@ -221,7 +224,13 @@ public class FullScreenFrame extends JFrame{
 					x, y, // source point 1
 					x + width, y + height, // source point 2
 					null
-				); 
+				);
+				
+				// TODO: 
+				// In case of opengl we need to somehow duplicate the context, 
+				// or something weird like that. 
+				// No idea exactly how that might work but hey... 
+				// Shouldn't be too hard to figure out...
 			}
 		}
 

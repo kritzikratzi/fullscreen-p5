@@ -1,22 +1,17 @@
 package fullscreen.tests;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferStrategy;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 
 import processing.core.PApplet;
-
 import fullscreen.SoftFullScreen;
 
 public class TemporaryGaga {
@@ -26,7 +21,7 @@ public class TemporaryGaga {
 		SoftFullScreen fs; 
 		
 		public void setup(){
-			size( 800, 600 ); 
+			size( 800, 600, OPENGL ); 
 		}
 		
 		
@@ -40,20 +35,12 @@ public class TemporaryGaga {
 	}
 	
 	public static void main( String args[]){
-		/*JFrame frame; 
-		frame = new JFrame(); 
-		frame.setVisible( true ); 
-		
-		PApplet dad = new SplitApplet();
-		frame.getContentPane().add( new PAppletPart( dad, 0, 0, 400, 400 ), BorderLayout.CENTER ); 
-		frame.pack(); 
-		dad.frame.setVisible( true );*/
-		PApplet dad = new SplitApplet(); 
-		SoftFullScreen fs = new SoftFullScreen( dad );
-		fs.setScreens( 
+		Demo.Simple demo = new Demo.Simple( 800, 800, PApplet.OPENGL );
+		SoftFullScreen fs = new SoftFullScreen( demo );
+		/*fs.setScreens( 
 			0, 0, 0, 400, 600, 
 			1, 400, 0, 400, 600 
-		);
+		);*/
 	}
 	
 	public static class PAppletPart extends JComponent{

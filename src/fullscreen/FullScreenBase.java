@@ -4,8 +4,10 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.lang.reflect.Method;
 
 import processing.core.PApplet;
@@ -33,7 +35,21 @@ public abstract class FullScreenBase {
 	static KeyEvent lastEvent = null;
 	
 	// Is opengl being used in this sketch? 
-	private boolean isGL; 
+	public final boolean isGL; 
+	
+	
+	// Key Listener
+	KeyListener keyListener = new KeyAdapter(){
+		public void keyPressed( KeyEvent e ){ keyEvent( e ); }
+	}; 
+	
+	// Window listener
+	WindowListener windowListener = new WindowAdapter(){
+		public void windowClosing( WindowEvent e ){
+			dad.exit();
+		}
+	};
+	
 	
 	/**
 	 * Create a fullscreen thingie
@@ -45,14 +61,7 @@ public abstract class FullScreenBase {
 		dad.registerKeyEvent( this );
 
 		// See if the graphics object somehow inherits from PGraphicsOpenGL
-		Class<?> clazz = dad.g.getClass(); 
-		while( clazz != null  ){
-			if( clazz.getName().equals( "processing.opengl.PGraphicsOpenGL" ) )
-				isGL = true;
-			
-			clazz = clazz.getSuperclass(); 
-		}
-		
+		isGL = FullScreenTools.isGL( dad ); 
 		if( isGL ){
 			// Make ppl aware that gl doesn't always work!
 			System.err.println( "FullScreen API: Warning, OPENGL Support is experimental! " ); 
@@ -111,19 +120,13 @@ public abstract class FullScreenBase {
 	 * Whatever frame this specific implementation uses, it has to be registered here so that key events can be caught
 	 */
 	protected void registerFrame( Frame f ){
-		// Key Listener
-		f.addKeyListener( new KeyAdapter(){
-			public void keyPressed( KeyEvent e ){
-				keyEvent( e );
-			}
-		}); 
-		
-		// Window listener
-		f.addWindowListener( new WindowAdapter(){
-			public void windowClosing( WindowEvent e ){
-				dad.exit();
-			}
-		} ); 
+		f.addKeyListener( keyListener );
+		f.addWindowListener( windowListener );  
+	}
+	
+	protected void unregisterFrame( Frame f ){
+		f.addKeyListener( keyListener );
+		f.addWindowListener( windowListener );  
 	}
 
 

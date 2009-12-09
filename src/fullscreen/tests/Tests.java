@@ -7,6 +7,7 @@ import org.junit.Test;
 import processing.core.PApplet;
 
 import fullscreen.FullScreen;
+import fullscreen.FullScreenTools;
 import fullscreen.SoftFullScreen;
 
 /**
@@ -34,15 +35,17 @@ public class Tests {
 	 */
 	@Test
 	public void softFS() throws Exception{
-		for( int screenNr = 0; screenNr < 2; screenNr ++ ){
+		for( int screenNr = 0; screenNr < FullScreenTools.devices().length; screenNr ++ ){
 			Demo.Simple sketch = new Demo.Simple();
 			SoftFullScreen fs = new SoftFullScreen( sketch, screenNr );
-			fs.setFullScreen( true );
 			
-			Thread.sleep( 2000 ); 
-			fs.setFullScreen( false ); 
-			
-			Thread.sleep( 2000 );
+			Thread.sleep( 1000 );
+			for( int i = 0; i < 10; i++ ){
+				fs.setFullScreen( true );
+				Thread.sleep( 500 ); 
+				fs.setFullScreen( false );
+				Thread.sleep( 500 );
+			}
 			
 			sketch.frame.setVisible( false ); 
 			sketch.stop(); 

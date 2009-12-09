@@ -22,6 +22,7 @@ package fullscreen;
 
 import japplemenubar.JAppleMenuBar;
 
+import java.awt.Frame;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -79,6 +80,7 @@ public class SoftFullScreen extends FullScreenBase{
 	public SoftFullScreen( PApplet dad, int screenNr ){
 		super( dad ); 
 		this.dad = dad;
+		setScreens( 0, 0, 0, dad.width, dad.height );
 	}
 	
 	/**
@@ -99,7 +101,13 @@ public class SoftFullScreen extends FullScreenBase{
 			return; 
 		}
 		
-		frames.clear(); 
+		for( Frame frame : frames ){
+			unregisterFrame( frame ); 
+			frame.dispose(); 
+		}
+		
+		frames.clear();
+		
 		for( int i = 0; i < numbers.length; i += 5 ){
 			int screenNr = numbers[i]; 
 			int x = numbers[i+1]; 
@@ -145,7 +153,7 @@ public class SoftFullScreen extends FullScreenBase{
 	
 	
 	@SuppressWarnings("deprecation")
-	private void setFullScreenImpl( boolean fullScreen ){
+	private synchronized void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
@@ -153,7 +161,7 @@ public class SoftFullScreen extends FullScreenBase{
 		else if( fullScreen ){
 			if( available() ){
 				// remove applet from processing frame and attach to fsFrame
-				dad.frame.setVisible( false );  
+				//dad.frame.setVisible( false );  
 				
 				if( PApplet.platform == PConstants.MACOSX ){
 					new JAppleMenuBar().setVisible( false );
