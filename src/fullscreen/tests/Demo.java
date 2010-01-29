@@ -65,6 +65,8 @@ public class Demo{
 				fill( ( i/5 + frameCount )%255 ); 
 				rect( i, i, width - 2*i, height - 2*i ); 
 			}
+			
+			println( ":" + get( 0, 0 ) ); 
 		}
 		
 	}
