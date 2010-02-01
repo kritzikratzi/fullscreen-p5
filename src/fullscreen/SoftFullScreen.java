@@ -128,8 +128,12 @@ public class SoftFullScreen extends FullScreenBase{
 	 *
 	 * @param fullScreen true or false
 	 */
-	public void setFullScreen( boolean fullScreen ){
-		new DelayedModeChange( fullScreen );  
+	public void setFullScreen( final boolean fullScreen ){
+		new DelayedAction( 2 ){
+			public void action(){
+				setFullScreenImpl( fullScreen ); 
+			}
+		};
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -143,7 +147,6 @@ public class SoftFullScreen extends FullScreenBase{
 				// remove applet from processing frame and attach to fsFrame
 				dad.frame.setVisible( false ); 
 				fsFrame.add( dad ); 
-				dad.requestFocus(); 
 				
 				if( PApplet.platform == PConstants.MACOSX ){
 					new JAppleMenuBar().setVisible( false ); 
@@ -156,6 +159,7 @@ public class SoftFullScreen extends FullScreenBase{
 				GLDrawableHelper.reAllocate( this ); 
 				GLTextureUpdateHelper.update( this ); 
 				
+				requestFocus();
 				notifySketch( dad );
 				
 				return; 
@@ -178,11 +182,11 @@ public class SoftFullScreen extends FullScreenBase{
 			}
 			
 			dad.frame.setVisible( true ); 
-			dad.requestFocus();
 			
 			GLDrawableHelper.reAllocate( this ); 
 			GLTextureUpdateHelper.update( this ); 
 			
+			requestFocus();
 			notifySketch( dad ); 
 			
 			return; 
@@ -197,28 +201,5 @@ public class SoftFullScreen extends FullScreenBase{
 	public void setResolution( int xRes, int yRes ) {
 		System.err.println( "Changing resolution is not supported in SoftFullScreen mode. " ); 
 		System.err.println( "Use the normal FullScreen mode to make use of that functionality.  " ); 
-	}
-
-	
-	/**
-	 * A sweet little helper. 
-	 */
-	public class DelayedModeChange{
-		private boolean state; 
-		private int skippedFrames = 0; 
-		
-		public DelayedModeChange( boolean state ){
-			this.state = state;
-			dad.registerPost( this ); 
-		}
-		
-		public void post(){
-			skippedFrames ++; 
-			
-			if( skippedFrames >= 2 ){
-				setFullScreenImpl( state );
-				dad.unregisterPost( this );
-			}
-		}
 	}
 }

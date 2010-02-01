@@ -170,6 +170,20 @@ public abstract class FullScreenBase {
 		}
 	}
 
+	
+	/**
+	 * Requests focus for the sketch.. 
+	 */
+	public void requestFocus(){
+		getSketch().requestFocus(); 
+		new DelayedAction( 2 ){
+			public void action(){
+				getSketch().requestFocus();
+			}
+		}; 
+	}
+	
+	
 	/**
 	 * Is opengl somehow being used in this sketch? 
 	 */
@@ -185,4 +199,28 @@ public abstract class FullScreenBase {
 	public PApplet getSketch() {
 		return dad;
 	}
+	
+	
+	/**
+	 * A sweet little helper. 
+	 */
+	public abstract class DelayedAction{
+		private int skipFrames = 0; 
+		
+		public DelayedAction( int skipFrames ){
+			dad.registerPost( this );
+			this.skipFrames = skipFrames; 
+		}
+		
+		public void post(){
+			skipFrames --; 
+			
+			if( skipFrames <= 0 ){
+				action(); 
+				dad.unregisterPost( this );
+			}
+		}
+		
+		public abstract void action(); 
+	}	
 }

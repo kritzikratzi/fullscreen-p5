@@ -132,8 +132,12 @@ public class FullScreen extends FullScreenBase {
 	 *
 	 * @param fullScreen true or false
 	 */
-	public void setFullScreen( boolean fullScreen ){
-		new DelayedModeChange( fullScreen ); 
+	public void setFullScreen( final boolean fullScreen ){
+		new DelayedAction( 2 ) {
+			public void action() {
+				setFullScreenImpl( fullScreen ); 
+			}
+		};
 	}
 	
 	/** 
@@ -158,13 +162,13 @@ public class FullScreen extends FullScreenBase {
 				fsDevice.setFullScreenWindow( fsFrame );
 				setResolution( 0, 0 ); 
 				
-				dad.requestFocus();
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 );
 				
 				GLDrawableHelper.reAllocate( this );
 				GLTextureUpdateHelper.update( this );
 				
 				// Tell the sketch about the resolution change
+				requestFocus();
 				notifySketch( getSketch() ); 
 			}
 			else{
@@ -183,12 +187,12 @@ public class FullScreen extends FullScreenBase {
 				dad.width + dad.frame.insets().left + dad.frame.insets().right, 
 				dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
 			);*/
-			dad.requestFocus(); 
 	
 			GLDrawableHelper.reAllocate( this );
 			GLTextureUpdateHelper.update( this );
 			
 			// Tell the sketch about the resolution change
+			requestFocus(); 
 			notifySketch( getSketch() );
 		}
 	}
@@ -344,27 +348,5 @@ public class FullScreen extends FullScreenBase {
 		System.arraycopy( resultTemp, 0, result, 0, found );
 		
 		return result; 
-	}
-
-	/**
-	 * A sweet little helper. 
-	 */
-	public class DelayedModeChange{
-		private boolean state; 
-		private int skippedFrames = 0; 
-		
-		public DelayedModeChange( boolean state ){
-			this.state = state;
-			dad.registerPost( this ); 
-		}
-		
-		public void post(){
-			skippedFrames ++; 
-			
-			if( skippedFrames >= 2 ){
-				setFullScreenImpl( state );
-				dad.unregisterPost( this );
-			}
-		}
 	}
 }
