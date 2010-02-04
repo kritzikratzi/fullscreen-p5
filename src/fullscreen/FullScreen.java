@@ -160,6 +160,7 @@ public class FullScreen extends FullScreenBase {
 				fsFrame.setSize( dad.width, dad.height ); 
 				fsFrame.add( dad ); 
 				fsDevice.setFullScreenWindow( fsFrame );
+				fsFrame.setExtendedState( Frame.MAXIMIZED_BOTH );
 				setResolution( 0, 0 ); 
 				
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 );

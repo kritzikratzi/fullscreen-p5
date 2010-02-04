@@ -23,7 +23,7 @@
 	<!-- path to the sketch folder -->
 	<property name="sketch.path" value="${user.home}/Documents/Processing" />
 	
-	<property name="version" value="0.98.3" />
+	<property name="version" value="0.98.4-testing" />
 	<fileset id="cp" includes="dependencies/*.jar" />
 	<path id="cp">
 		<fileset dir="." includes="dependencies/*.jar" />

@@ -50,7 +50,7 @@ import processing.core.PConstants;
 
 public class SoftFullScreen extends FullScreenBase{
 	// We use this frame to go to fullScreen mode...
-	Frame fsFrame = new Frame(); 
+	Frame fsFrame; 
 	GraphicsDevice fsDevice;
 	
 	//AWTEventListener fsKeyListener;
@@ -91,6 +91,7 @@ public class SoftFullScreen extends FullScreenBase{
 		}
 		
 		fsDevice = devices[screenNr]; 
+		fsFrame = new Frame( fsDevice.getDefaultConfiguration() );
 		fsFrame.setTitle( "FullScreen" ); 
 		fsFrame.setUndecorated( true ); 
 		fsFrame.setBackground( Color.black ); 
@@ -155,6 +156,7 @@ public class SoftFullScreen extends FullScreenBase{
 				fsFrame.setVisible( true ); 
 				fsFrame.setLocation( fsDevice.getDefaultConfiguration().getBounds().getLocation() );
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 ); 
+				fsFrame.setExtendedState( Frame.MAXIMIZED_BOTH );		
 				
 				GLDrawableHelper.reAllocate( this ); 
 				GLTextureUpdateHelper.update( this ); 
