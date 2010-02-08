@@ -9,13 +9,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.InvocationTargetException;
 
+import javax.media.opengl.GLContext;
 import javax.swing.JFrame;
 
 import processing.core.PApplet;
 import processing.opengl.PGraphicsOpenGL;
 import fullscreen.renderers.ClassicRenderer;
-import fullscreen.renderers.GLRenderer;
 import fullscreen.renderers.Renderer;
 
 public class FullScreenFrame extends JFrame{
@@ -41,12 +42,24 @@ public class FullScreenFrame extends JFrame{
 		this.height = height;
 		
 		if( FullScreenTools.isGL( dad ) ){
-			PGraphicsOpenGL g = (PGraphicsOpenGL) dad.g; 
-			renderer = new GLRenderer( dad, g.getContext(), x, y, width, height );
+			System.out.println( "IS GL!" ); 
+			javax.media.opengl.GLContext context = ((PGraphicsOpenGL) dad.g).getContext(); 
+			// renderer = new fullscreen.renderers.GLRenderer( dad, context, x, y, width, height );
+			try {
+				renderer = (Component) Class.forName( "fullscreen.renderers.GLRenderer" ).
+					getConstructor( PApplet.class, GLContext.class, Integer.class, Integer.class, Integer.class, Integer.class ).
+					newInstance( dad, context, x, y, width, height );
+			}
+			catch (Exception e) {
+				System.err.println( "FullScreen API: Sorry, GLRenderer not fond. " ); 
+				System.err.println( "                I don't know what to say... bye!" ); 
+				System.exit( 1 ); 
+			}
 		}
 		else{
 			renderer = new ClassicRenderer( dad, x, y, width, height );
 		}
+		
 		getContentPane().add( renderer, BorderLayout.CENTER );
 		setupEvents(); 
 		

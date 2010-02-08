@@ -115,7 +115,7 @@ public class SoftFullScreen extends FullScreenBase{
 			int width = numbers[i+3]; 
 			int height = numbers[i+4];
 			
-			FullScreenFrame frame = new FullScreenFrame(dad, screenNr, x, y, width, height );
+			FullScreenFrame frame = new FullScreenFrame( dad, screenNr, x, y, width, height );
 			registerFrame( frame ); 
 			frames.add( frame ); 
 		}
