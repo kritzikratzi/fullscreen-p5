@@ -125,8 +125,8 @@ public abstract class FullScreenBase {
 	}
 	
 	protected void unregisterFrame( Frame f ){
-		f.addKeyListener( keyListener );
-		f.addWindowListener( windowListener );  
+		f.removeKeyListener( keyListener );
+		f.removeWindowListener( windowListener );
 	}
 
 

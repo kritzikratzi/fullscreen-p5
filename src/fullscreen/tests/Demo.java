@@ -33,6 +33,11 @@ public class Demo{
 		// What size do we want? 
 		private final int w, h; 
 		
+		
+		// Recent mouse coordinates... 
+		int mouse[][] = new int[100][2]; 
+		int pointer; 
+		
 		/**
 		 * Creates the simple sketch using the JAVA2D renderer
 		 */
@@ -54,19 +59,28 @@ public class Demo{
 		
 		@Override
 		public void setup(){
-			size( w, h, renderThing ); 
+			size( w, h, renderThing );
+			frameRate( 200 ); 
 		}
 		
 		@Override
 		public void draw(){
-			noStroke(); 
+			background( 255 ); 
+			stroke( 0 );  
 			
-			for( int i = 0; i < min( width/2, height/2 ); i+= 20 ){
-				fill( ( i/5 + frameCount )%255 ); 
-				rect( i, i, width - 2*i, height - 2*i ); 
+			
+			pointer ++;
+			pointer %= mouse.length; 
+			mouse[pointer][0] = mouseX; 
+			mouse[pointer][1] = mouseY;
+			
+			rect( 400, 0, 400, 512 ); 
+			beginShape(); 
+			for( int i = 0; i <= mouse.length; i++ ){
+				int a[] = mouse[ ( pointer + i )% mouse.length ]; 
+				vertex( a[0], a[1] ); 
 			}
-			
-			println( ":" + get( 0, 0 ) ); 
+			endShape(); 
 		}
 		
 	}
