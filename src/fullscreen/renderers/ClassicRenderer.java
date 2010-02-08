@@ -73,9 +73,9 @@ public class ClassicRenderer extends JComponent implements Renderer{
 			g.setColor( Color.black ); 
 			//g.fillRect( 0, 0, getWidth(), getHeight() );
 			g.fillRect( 0, 0, getWidth(), boundaries.y );
-			g.fillRect( 0, boundaries.y + height, getWidth(), boundaries.y ); 
-			g.fillRect( 0, boundaries.y, boundaries.x, boundaries.y + height ); 
-			g.fillRect( boundaries.x + width, boundaries.y, getWidth(), boundaries.y + height ); 
+			g.fillRect( 0, boundaries.y + boundaries.height, getWidth(), boundaries.y ); 
+			g.fillRect( 0, boundaries.y, boundaries.x, boundaries.y + boundaries.height ); 
+			g.fillRect( getWidth()-boundaries.x, boundaries.y, boundaries.x, boundaries.y + boundaries.height ); 
 			
 			
 			// convenient! 
@@ -85,7 +85,7 @@ public class ClassicRenderer extends JComponent implements Renderer{
 			// faster? 
 			g.drawImage( dad.g.image, 
 				boundaries.x, boundaries.y, // destination point 1
-				boundaries.x + width, boundaries.y + height, // destination point 2
+				boundaries.x + boundaries.width, boundaries.y + boundaries.height, // destination point 2
 				x, y, // source point 1
 				x + width, y + height, // source point 2
 				null

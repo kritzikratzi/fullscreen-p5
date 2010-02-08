@@ -150,5 +150,4 @@ public class GLRenderer extends GLCanvas implements Renderer{
 	public void die() {
 		dad.unregisterPost( this ); 
 	}
-	
 }

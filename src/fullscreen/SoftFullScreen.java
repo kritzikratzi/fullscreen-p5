@@ -80,7 +80,7 @@ public class SoftFullScreen extends FullScreenBase{
 	public SoftFullScreen( PApplet dad, int screenNr ){
 		super( dad ); 
 		this.dad = dad;
-		setScreens( 0, 0, 0, dad.width, dad.height );
+		setScreens( screenNr, 0, 0, dad.width, dad.height );
 	}
 	
 	/**
@@ -123,7 +123,7 @@ public class SoftFullScreen extends FullScreenBase{
 	
 	
 	/**
-	 * Are we in FullScreen mode? 
+	 * Are we in FullScreen mode?
 	 *
 	 * @return true if so, yes if not
 	 */

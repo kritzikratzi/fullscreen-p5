@@ -27,10 +27,6 @@ public class FullScreenFrame extends JFrame{
 	// And the painter
 	private Component renderer; 
 	
-	// Active? 
-	private boolean active = false; 
-	
-	
 	private int x, y, width, height; 
 	/**
 	 * Creates a fullscreen-frame thing. 
@@ -39,7 +35,7 @@ public class FullScreenFrame extends JFrame{
 	 */
 	public FullScreenFrame( PApplet dad, int screenNr, int x, int y, int width, int height ){
 		this.dad = dad;
-		this.x = x; 
+		this.x = x;
 		this.y = y; 
 		this.width = width; 
 		this.height = height;
@@ -60,7 +56,6 @@ public class FullScreenFrame extends JFrame{
 		setTitle( dad.frame == null?"":dad.frame.getTitle() ); 
 		setUndecorated( true );
 		setVisible( false ); 
-		
 	}
 	
 	
@@ -152,12 +147,6 @@ public class FullScreenFrame extends JFrame{
 	}
 	
 	
-	@Override
-	public void setVisible( boolean visible ){
-		super.setVisible( visible );
-		active = visible; 
-	}
-
 	@Override
 	public void requestFocus() {
 		renderer.requestFocus(); 

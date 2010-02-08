@@ -74,4 +74,28 @@ public class Tests {
 			sketch.destroy(); 
 		}
 	}
+	
+	/**
+	 * Test split soft-fullscreen
+	 */
+	@Test
+	public void testSplit() throws Exception{
+		Demo.Simple sketch = new Demo.Simple();
+		SoftFullScreen fs = new SoftFullScreen( sketch );
+		fs.setScreens(
+			0, 0, 0, 400, 400, 
+			1, 0, 0, 800, 800 
+		);
+		Thread.sleep( 1000 );
+		for( int i = 0; i < 10; i++ ){
+			fs.setFullScreen( true );
+			Thread.sleep( 500 ); 
+			fs.setFullScreen( false );
+			Thread.sleep( 500 );
+		}
+			
+		sketch.frame.setVisible( false ); 
+		sketch.stop(); 
+		sketch.destroy(); 
+	}
 }

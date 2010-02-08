@@ -42,7 +42,7 @@ public class Demo{
 		 * Creates the simple sketch using the JAVA2D renderer
 		 */
 		public Simple(){
-			this( 800, 600, JAVA2D );
+			this( 800, 800, JAVA2D );
 		}
 		
 		/**
@@ -82,7 +82,6 @@ public class Demo{
 			}
 			endShape(); 
 		}
-		
 	}
 
 	
