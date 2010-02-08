@@ -27,6 +27,8 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 
+import com.sun.awt.AWTUtilities;
+
 import processing.core.PApplet;
 import processing.core.PConstants;
 
@@ -60,6 +62,11 @@ public class SoftFullScreen extends FullScreenBase{
 	
 	private boolean isFullScreen = false; 
 	Vector<FullScreenFrame> frames = new Vector<FullScreenFrame>(); 
+	
+	// Can we already switch back? 
+	private boolean canSwitch = true; 
+	private float originalAlpha; 
+	private float fullscreenAlpha; 
 	
 	/**
 	 * Creates a new softfullscreen object. 
@@ -168,28 +175,31 @@ public class SoftFullScreen extends FullScreenBase{
 				}
 				
 				for( JFrame frame : frames ){
+					AWTUtilities.setWindowOpacity( frame, 0 );
 					frame.setVisible( true ); 
 					frame.requestFocus(); 
 				}
 				
 				//GLDrawableHelper.reAllocate( this ); 
 				//GLTextureUpdateHelper.update( this ); 
+				fullscreenAlpha = 1; 
+				originalAlpha = 0; 
 				
 				notifySketch( dad );
 				isFullScreen = true; 
-				return; 
 			}
 			else{
-				System.err.println( "FullScreen API: Fullscreen mode not available" ); 
+				System.err.println( "FullScreen API: Fullscreen mode not available" );
 				return; 
 			}
 		}
 		else{
 			// remove applet from fsFrame and attach to processing frame
-			for( JFrame frame : frames ){
-				frame.setVisible( false ); 
-			}
+			//for( JFrame frame : frames ){
+			//	frame.setVisible( false ); 
+			//}
 			
+			AWTUtilities.setWindowOpacity( dad.frame, 0 ); 
 			dad.frame.setVisible( true ); 
 			dad.requestFocus();
 			
@@ -201,12 +211,51 @@ public class SoftFullScreen extends FullScreenBase{
 			
 			//GLDrawableHelper.reAllocate( this ); 
 			//GLTextureUpdateHelper.update( this ); 
+			fullscreenAlpha = 0; 
+			originalAlpha = 1; 
 			
 			notifySketch( dad ); 
 			isFullScreen = false; 
-			
-			return; 
 		}
+		
+		canSwitch = false; 
+		new Thread(){
+			public void run(){
+				float origA = 1-originalAlpha;
+				float fullA = 1-fullscreenAlpha;
+				
+				while( Math.abs( origA - originalAlpha ) > 0.02 ){
+					origA += ( originalAlpha - origA )/5f;
+					fullA += ( fullscreenAlpha - fullA )/5f;
+					AWTUtilities.setWindowOpacity( dad.frame, origA );
+					for( JFrame frame : frames ){
+						AWTUtilities.setWindowOpacity( frame, fullA ); 
+					}
+					
+					try{
+						Thread.sleep( 20 );
+					}
+					catch( InterruptedException e ){
+						e.printStackTrace(); 
+						break; 
+					}
+				}
+				
+				AWTUtilities.setWindowOpacity( dad.frame, originalAlpha);
+				for( JFrame frame : frames ){
+					AWTUtilities.setWindowOpacity( frame, fullscreenAlpha ); 
+				}
+				
+				//if( originalAlpha == 0 ) dad.frame.setVisible( false ); 
+				if( fullscreenAlpha == 0 ){
+					for( JFrame frame : frames ){
+						frame.setVisible( false );  
+					}
+				}
+				
+				canSwitch = true; 
+			}
+		}.start(); 
 	}
 
 
@@ -235,7 +284,7 @@ public class SoftFullScreen extends FullScreenBase{
 		public void post(){
 			skippedFrames ++; 
 			
-			if( skippedFrames >= 2 ){
+			if( skippedFrames >= 2 && canSwitch ){
 				setFullScreenImpl( state );
 				dad.unregisterPost( this );
 			}

@@ -1,9 +1,14 @@
 package fullscreen;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -12,11 +17,14 @@ import java.awt.event.MouseMotionListener;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.media.opengl.GLContext;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import processing.core.PApplet;
 import processing.opengl.PGraphicsOpenGL;
 import fullscreen.renderers.ClassicRenderer;
+import fullscreen.renderers.GLRenderer;
 import fullscreen.renderers.Renderer;
 
 public class FullScreenFrame extends JFrame{
@@ -46,13 +54,15 @@ public class FullScreenFrame extends JFrame{
 			javax.media.opengl.GLContext context = ((PGraphicsOpenGL) dad.g).getContext(); 
 			// renderer = new fullscreen.renderers.GLRenderer( dad, context, x, y, width, height );
 			try {
-				renderer = (Component) Class.forName( "fullscreen.renderers.GLRenderer" ).
+				/*renderer = (Component) Class.forName( "fullscreen.renderers.GLRenderer" ).
 					getConstructor( PApplet.class, GLContext.class, Integer.class, Integer.class, Integer.class, Integer.class ).
-					newInstance( dad, context, x, y, width, height );
+					newInstance( dad, context, x, y, width, height );*/
+				renderer = new GLRenderer( dad, context, x, y, width, height ); 
 			}
 			catch (Exception e) {
-				System.err.println( "FullScreen API: Sorry, GLRenderer not fond. " ); 
+				System.err.println( "FullScreen API: Sorry, GLRenderer not found. " ); 
 				System.err.println( "                I don't know what to say... bye!" ); 
+				e.printStackTrace(); 
 				System.exit( 1 ); 
 			}
 		}
@@ -61,20 +71,33 @@ public class FullScreenFrame extends JFrame{
 		}
 		
 		getContentPane().add( renderer, BorderLayout.CENTER );
-		setupEvents(); 
+		// Fix for mac os: 
+		// Add a 1-px border if using open gl
+		// TODO: 
+		// with this fix in place it is possible to click at the 
+		// lowest pixel-line to lose focus. 
+		// need to figure out where the focus goes ... 
+		if( System.getProperty( "os.name" ).contains( "Mac OS X" ) && FullScreenTools.isGL( dad ) ){
+			MacFixer fixer = new MacFixer(); 
+			getContentPane().add( fixer, BorderLayout.SOUTH );
+			setupKeyEvents( fixer ); 
+		}
+		
+		setupKeyEvents( renderer );
+		setupMouseEvents( renderer );
 		
 		GraphicsDevice device = FullScreenTools.getScreenDevice( screenNr ); 
 		setBounds( device.getDefaultConfiguration().getBounds() );
 		setExtendedState( MAXIMIZED_BOTH );
 		setTitle( dad.frame == null?"":dad.frame.getTitle() ); 
 		setUndecorated( true );
-		setVisible( false ); 
+		setVisible( false );
 	}
 	
 	
-	private void setupEvents(){
+	private void setupMouseEvents( Component component ){
 		// Forward all sorts of events... 
-		renderer.addMouseMotionListener( new MouseMotionListener(){
+		component.addMouseMotionListener( new MouseMotionListener(){
 			@Override
 			public void mouseDragged( MouseEvent e ) {
 				if( ( e = duplicate( e ) ) != null ) dad.mouseDragged( e ); 
@@ -86,7 +109,7 @@ public class FullScreenFrame extends JFrame{
 			}
 		} );
 		
-		renderer.addMouseListener( new MouseListener(){
+		component.addMouseListener( new MouseListener(){
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if( ( e = duplicate( e ) ) != null ) dad.mouseClicked( e ); 
@@ -112,8 +135,11 @@ public class FullScreenFrame extends JFrame{
 				if( ( e = duplicate( e ) ) != null ) dad.mouseReleased( e ); 
 			}
 		}); 
-		
-		renderer.addKeyListener( new KeyListener(){
+	}
+	
+
+	private void setupKeyEvents( Component component ){
+		component.addKeyListener( new KeyListener(){
 			@Override
 			public void keyPressed(KeyEvent e) {
 				dad.keyPressed( e ); 
@@ -130,7 +156,6 @@ public class FullScreenFrame extends JFrame{
 			}
 		}); 		
 	}
-	
 	
 	/**
 	 * Duplicates a mouse event, but only if necessary!  
@@ -171,6 +196,30 @@ public class FullScreenFrame extends JFrame{
 		((Renderer) renderer).die(); 
 		
 		super.dispose();
+	}
+	
+	
+	private class MacFixer extends JComponent{
+		@Override
+		public void paint(Graphics g) {
+			g.setColor( Color.black ); 
+			g.fillRect( 0, 0, getWidth(), getHeight() ); 
+		}
+		
+		@Override
+		public Dimension getPreferredSize(){
+			return new Dimension( 200, 1 ); 
+		}
+		
+		@Override
+		public Dimension getMinimumSize() {
+			return new Dimension( 200, 1 ); 
+		}
+		
+		@Override
+		public Dimension getMaximumSize() {
+			return new Dimension( Integer.MAX_VALUE, 1 ); 
+		}
 	}
 }
 

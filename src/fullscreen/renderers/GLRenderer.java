@@ -148,6 +148,10 @@ public class GLRenderer extends GLCanvas implements Renderer{
 
 	@Override
 	public void die() {
-		dad.unregisterPost( this ); 
+		dad.unregisterPost( this );
+		if( texID != 0 ){
+			detainContext( getContext() );
+			g.gl.glDeleteTextures( 1, new int[]{ texID }, 0 ); 
+		}
 	}
 }
