@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.media.opengl.GLContext;
@@ -50,14 +51,11 @@ public class FullScreenFrame extends JFrame{
 		this.height = height;
 		
 		if( FullScreenTools.isGL( dad ) ){
-			System.out.println( "IS GL!" ); 
 			javax.media.opengl.GLContext context = ((PGraphicsOpenGL) dad.g).getContext(); 
-			// renderer = new fullscreen.renderers.GLRenderer( dad, context, x, y, width, height );
 			try {
-				/*renderer = (Component) Class.forName( "fullscreen.renderers.GLRenderer" ).
-					getConstructor( PApplet.class, GLContext.class, Integer.class, Integer.class, Integer.class, Integer.class ).
-					newInstance( dad, context, x, y, width, height );*/
-				renderer = new GLRenderer( dad, context, x, y, width, height ); 
+				Constructor c = Class.forName( "fullscreen.renderers.GLRenderer" ).getConstructors()[0];
+				renderer = (Component) c.newInstance( dad, context, x, y, width, height );
+				//renderer = new GLRenderer( dad, context, x, y, width, height ); 
 			}
 			catch (Exception e) {
 				System.err.println( "FullScreen API: Sorry, GLRenderer not found. " ); 

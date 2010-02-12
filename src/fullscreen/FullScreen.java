@@ -1,7 +1,7 @@
 /*
   Part of the Processing Fullscreen API
 
-  Copyright (c) 2006-09 Hansi Raber
+  Copyright (c) 2006-08 Hansi Raber
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -20,100 +20,121 @@
 */
 package fullscreen;
 
+import japplemenubar.JAppleMenuBar;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.DisplayMode;
 import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+import java.util.Vector;
+
+import javax.swing.JFrame;
+
+import com.sun.awt.AWTUtilities;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 /**
- *  Creates a new fullscreen object. <br>
+ *  Creates a new softfullscreen object. <br>
  *  
- *  This will use <a href="http://java.sun.com/docs/books/tutorial/extra/fullscreen/index.html" target="_blank">fullscreen exclusive mode</a>
- *  to bring your sketch to the screen. <br>
+ *  This will use undecorated frames to bring your sketch to the screen. <br>
  *  The advantages are: 
  *  
  *  <ul>
- *    <li>Notifications from your OS will not be on top of your sketch</li>
- *    <li>The screensaver will be disabled automatically</li>
+ *    <li>You can create a sketch that spans across multiple monitors easily</li>
  *  </ul>
  *  
  *  The drawbacks are: 
  *  <ul>
- *    <li>It's hard to use two screens</li>
+ *    <li>You cannot change resolution</li>
+ *    <li>Screensaver must be disabled manually</li>
+ *    <li>Notifications and other kinds of annoying popups might just show up on top of your sketch</li>
  *  </ul>
  */
-
-public class FullScreen extends FullScreenBase {
+public class FullScreen extends FullScreenBase{
 	// We use this frame to go to fullScreen mode...
-	GraphicsDevice fsDevice;
-	
 	//AWTEventListener fsKeyListener;
-	
-	// desired x/y resolution
-	int fsResolutionX, fsResolutionY; 
 	
 	// the first time wait until the frame is displayed
 	boolean fsIsInitialized; 
 	
 	// Daddy...
-	private PApplet dad;
+	PApplet dad; 
 	
-	// Refresh rate
-	private int refreshRate; 
+	private boolean isFullScreen = false; 
+	Vector<FullScreenFrame> frames = new Vector<FullScreenFrame>(); 
 	
-	// A frame for going fullscreen
-	private Frame fsFrame; 
-	
-	/**
-	 * Create a fullscreen object based on a specific screen
-	 * 
-	 * @param dad Your sketch
-	 * @param screenNr The screen number in a multi-monitor system. Counting starts at zero. 
-	 */
-	public FullScreen( final PApplet dad, int screenNr ){
-		super( dad ); 
-		this.dad = dad; 
-
-		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		if( screenNr >= devices.length ){
-			System.err.println( "FullScreen API: You requested to use screen nr. " + screenNr + ", " ); 
-			System.err.println( "however, there are only " + devices.length + " screens in your environment. " ); 
-			System.err.println( "Continuing with screen nr. 0" );
-			screenNr = 0; 
-		}
-		
-		fsDevice = devices[screenNr]; 
-		fsFrame = new Frame(); 
-		fsFrame.setTitle( dad.frame.getTitle() ); 
-		fsFrame.setUndecorated( true ); 
-		fsFrame.setBackground( Color.black ); 
-		if( dad.width > 0 ){
-			setResolution( dad.width, dad.height );
-		}
-	}
+	// Can we already switch back? 
+	private boolean canSwitch = true; 
+	private float originalAlpha; 
+	private float fullscreenAlpha; 
 	
 	/**
-	 * Create a new fullscreen object
+	 * Creates a new softfullscreen object. 
 	 * 
-	 * @param dad Your sketch
+	 * @param dad The parent sketch (aka "this")
 	 */
 	public FullScreen( PApplet dad ){
 		this( dad, 0 ); 
 	}
 	
+	/**
+	 * Creates a new softfullscreen object on a specific screen 
+	 * (numbering starts at 0)
+	 * 
+	 * @param dad The parent sketch (usually "this")
+	 * @param screenNr The screen number. 
+	 */
+	public FullScreen( PApplet dad, int screenNr ){
+		super( dad ); 
+		this.dad = dad;
+		setScreens( screenNr, 0, 0, dad.width, dad.height );
+	}
 	
 	/**
-	 * Are we in FullScreen mode? 
+	 * Sets the crop-regions...
+	 * @param numbers screen 1, x1, y1, width1, height1, screen 2, x2, y2, width2, height2, etc.   
+	 */
+	public void setScreens( int ... numbers ){
+		if( numbers.length % 5 != 0 ){
+			System.err.println( "FullScreen API: You defined the screen-regions, but the input format doesn't match. " );
+			System.err.println( "Use like this: " ); 
+			System.err.println( "fs.setScreens( screen-nr1, x1, y1, width1, height1, screen-nr2, width2, height2" );
+			System.err.println( "" ); 
+			System.err.println( "e.g. fs.setScreens( 0, 0, 0, 800, 600 ); // applet on screen 0" ); 
+			System.err.println( "e.g. fs.setScreens( 1, 0, 0, 800, 600 ); // applet on screen 1" ); 
+			System.err.println( "e.g. fs.setScreens( 0, 0, 0, 400, 600,  1, 400, 0, 400, 600 ); // half on screen 0, half on screen 1" ); 
+			System.err.println( "" );
+			System.err.println( "Your call is ignored, please fix this! " ); 
+			return; 
+		}
+		
+		for( Frame frame : frames ){
+			unregisterFrame( frame ); 
+			frame.dispose(); 
+		}
+		
+		frames.clear();
+		
+		for( int i = 0; i < numbers.length; i += 5 ){
+			int screenNr = numbers[i]; 
+			int x = numbers[i+1]; 
+			int y = numbers[i+2]; 
+			int width = numbers[i+3]; 
+			int height = numbers[i+4];
+			
+			FullScreenFrame frame = new FullScreenFrame( dad, screenNr, x, y, width, height );
+			registerFrame( frame ); 
+			frames.add( frame ); 
+		}
+	}
+	
+	
+	/**
+	 * Are we in FullScreen mode?
 	 *
 	 * @return true if so, yes if not
 	 */
 	public boolean isFullScreen(){
-		return fsDevice.getFullScreenWindow() == fsFrame; 
+		return isFullScreen; 
 	}
 	
 	
@@ -126,226 +147,127 @@ public class FullScreen extends FullScreenBase {
 		return dad.frame != null;
 	}
 	
-
+	
 	/**
 	 * Enters/Leaves fullScreen mode. 
 	 *
 	 * @param fullScreen true or false
 	 */
 	public void setFullScreen( boolean fullScreen ){
-		new DelayedModeChange( fullScreen ); 
+		new DelayedModeChange( fullScreen );  
 	}
 	
-	/** 
-	 * Don't use this! 
-	 */
+	
 	@SuppressWarnings("deprecation")
-	private void setFullScreenImpl( boolean fullScreen ){
+	private synchronized void setFullScreenImpl( boolean fullScreen ){
 		if( fullScreen == isFullScreen() ){
 			// no change required! 
 			return; 
 		}
 		else if( fullScreen ){
-			// go to fullScreen mode...
-			
 			if( available() ){
-				dad.frame.setVisible( false );
-				dad.frame.remove( dad ); 
-				fsFrame.setVisible( true );
-				fsFrame.setLayout( null ); 
-				fsFrame.setSize( dad.width, dad.height ); 
-				fsFrame.add( dad ); 
-				fsDevice.setFullScreenWindow( fsFrame );
-				setResolution( 0, 0 ); 
+				// remove applet from processing frame and attach to fsFrame
+				//dad.frame.setVisible( false );  
 				
-				dad.requestFocus();
-				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 );
+				if( PApplet.platform == PConstants.MACOSX ){
+					new JAppleMenuBar().setVisible( false );
+				}
 				
-				GLDrawableHelper.reAllocate( this );
-				GLTextureUpdateHelper.update( this );
+				for( JFrame frame : frames ){
+					AWTUtilities.setWindowOpacity( frame, 0 );
+					frame.setVisible( true ); 
+					frame.requestFocus(); 
+				}
 				
-				// Tell the sketch about the resolution change
-				notifySketch( getSketch() ); 
+				//GLDrawableHelper.reAllocate( this ); 
+				//GLTextureUpdateHelper.update( this ); 
+				fullscreenAlpha = 1; 
+				originalAlpha = 0; 
+				
+				notifySketch( dad );
+				isFullScreen = true; 
 			}
 			else{
-				System.err.println( "FullScreen API: Not available in applets. " ); 
+				System.err.println( "FullScreen API: Fullscreen mode not available" );
+				return; 
 			}
 		}
 		else{
-			fsDevice.setFullScreenWindow( null );
-			fsFrame.setVisible( false );
-			fsFrame.remove( dad );
+			// remove applet from fsFrame and attach to processing frame
+			//for( JFrame frame : frames ){
+			//	frame.setVisible( false ); 
+			//}
 			
-			dad.frame.add( dad ); 
+			AWTUtilities.setWindowOpacity( dad.frame, 0 ); 
 			dad.frame.setVisible( true ); 
-			dad.setLocation( dad.frame.insets().left, dad.frame.insets().top );
-			/*dad.frame.setSize(
-				dad.width + dad.frame.insets().left + dad.frame.insets().right, 
-				dad.height + dad.frame.insets().top + dad.frame.insets().bottom 
-			);*/
-			dad.requestFocus(); 
-	
-			GLDrawableHelper.reAllocate( this );
-			GLTextureUpdateHelper.update( this );
+			dad.requestFocus();
 			
-			// Tell the sketch about the resolution change
-			notifySketch( getSketch() );
-		}
-	}
-	
-	
-	/**
-	 * Change display resolution. Only sets the resolution, use 
-	 * setFullScreen( true ) to go to fullscreen mode! 
-	 *
-	 * If you're not in fullscreen mode it memorizes the resolution and sets
-	 * it the next time you go in fullscreen mode
-	 */
-	public void setResolution( int xRes, int yRes ){
-		if( xRes > 0 && yRes > 0 ){
-			fsResolutionX = xRes; 
-			fsResolutionY = yRes; 
+			// processing.core.fullscreen_texturehelper.update( dad );
+			if( PApplet.platform == PConstants.MACOSX ){
+				new JAppleMenuBar().setVisible( true );
+			}
+			
+			
+			//GLDrawableHelper.reAllocate( this ); 
+			//GLTextureUpdateHelper.update( this ); 
+			fullscreenAlpha = 0; 
+			originalAlpha = 1; 
+			
+			notifySketch( dad ); 
+			isFullScreen = false; 
 		}
 		
-		
-		// only change in fullscreen mode
-		if( !isFullScreen() ){
-			return; 
-		}
-		
-		
-		// Change resolution only if values are somehow meaningfull
-		if( fsResolutionX <= 0 || fsResolutionY <= 0 ){
-			// dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
-			return; 
-		}
-		
-		DisplayMode modes[ ] = fsDevice.getDisplayModes(); 
-		DisplayMode theMode = null; 
-	
-		for( int i = 0; i < modes.length; i++ ){
-			if( modes[ i ].getWidth() == fsResolutionX && modes[ i ].getHeight() == fsResolutionY ){
-				if( refreshRate == 0 || refreshRate == modes[i].getRefreshRate() ){
-					theMode = modes[ i ];
+		canSwitch = false; 
+		new Thread(){
+			public void run(){
+				float origA = 1-originalAlpha;
+				float fullA = 1-fullscreenAlpha;
+				
+				while( Math.abs( origA - originalAlpha ) > 0.02 ){
+					origA += ( originalAlpha - origA )/5f;
+					fullA += ( fullscreenAlpha - fullA )/5f;
+					AWTUtilities.setWindowOpacity( dad.frame, origA );
+					for( JFrame frame : frames ){
+						AWTUtilities.setWindowOpacity( frame, fullA ); 
+					}
+					
+					try{
+						Thread.sleep( 20 );
+					}
+					catch( InterruptedException e ){
+						e.printStackTrace(); 
+						break; 
+					}
 				}
-			}
-		}
-	
-	
-		// Resolution not supported? 
-		if( theMode == null ){
-			System.err.println( "FullScreen API: Display mode not supported: " + fsResolutionX + "x" + fsResolutionY ); 
-			// dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 ); 
-			return; 
-		}
-	
-	
-		// Wait until we are in fullScreen exclusive mode..
-		try{
-			fsDevice.setDisplayMode( theMode ); 
-			fsFrame.setSize( fsResolutionX, fsResolutionY ); 
-		}
-		catch( Exception e ){
-			System.err.println( "FullScreen API: Failed to go to fullScreen mode" ); 
-			e.printStackTrace(); 
-			return; 
-		}
-	
-		dad.setLocation( ( fsDevice.getDisplayMode().getWidth() - dad.width ) / 2, ( fsDevice.getDisplayMode().getHeight() - dad.height ) / 2 );
-	}
-	
-	
-	/**
-	 * Returns the current refresh rate
-	 */
-	public int getRefreshRate(){
-		return fsDevice.getDisplayMode().getRefreshRate();  
-	}
-	
-	/**
-	 * Sets the refresh rate
-	 */
-	public void setRefreshRate( int rate ){
-		this.refreshRate = rate; 
-	}
-	
-	/**
-	 * List resolution for this screen
-	 */
-	public Dimension[] getResolutions(){
-		return getResolutions( fsDevice ); 
-	}
-	
-	/**
-	 * List resolutions for a graphics device
-	 */
-	public static Dimension[] getResolutions( GraphicsDevice device ){
-		DisplayMode modes[] = device.getDisplayModes();
-		
-		// count the number of different resolutions... 
-		int found = 0; 
-		Dimension resultTemp[] = new Dimension[modes.length]; 
-		for( int i = 0; i < modes.length; i++ ){
-			for( int j = i; j < modes.length; j++ ){
-				if(    modes[i].getWidth() != modes[j].getWidth() 
-					&& modes[i].getHeight() != modes[j].getHeight()
-					&& modes[i].getBitDepth() != 8 
-					&& modes[i].getBitDepth() != 16
-				){
-					// looks good! 
-					resultTemp[found] = new Dimension( modes[i].getWidth(), modes[i].getHeight() );
-					found ++; 
-					break; 
+				
+				AWTUtilities.setWindowOpacity( dad.frame, originalAlpha);
+				for( JFrame frame : frames ){
+					AWTUtilities.setWindowOpacity( frame, fullscreenAlpha ); 
 				}
+				
+				//if( originalAlpha == 0 ) dad.frame.setVisible( false ); 
+				if( fullscreenAlpha == 0 ){
+					for( JFrame frame : frames ){
+						frame.setVisible( false );  
+					}
+				}
+				
+				canSwitch = true; 
 			}
-		}
-		
-		Dimension result[] = new Dimension[found]; 
-		System.arraycopy( resultTemp, 0, result, 0, found );
-		
-		return result; 
-	}
-	
-	/**
-	 * Get a list of available screen resolutions
-	 */
-	public static Dimension[] getResolutions( int screenNr ){
-		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		if( screenNr >= devices.length ){
-			System.err.println( "FullScreen API: You requested the resolutions of screen nr. " + screenNr + ", " ); 
-			System.err.println( "however, there are only " + devices.length + " screens in your environment. " ); 
-			System.err.println( "Continuing with screen nr. 0" );
-			screenNr = 0; 
-		}
-		
-		return getResolutions( devices[screenNr] );  
-	}
-	
-	/**
-	 * Get a list of refresh rates available for a resolution
-	 */
-	public int[] getRefreshRates( int xRes, int yRes ){
-		DisplayMode modes[] = fsDevice.getDisplayModes(); 
-		int resultTemp[] = new int[modes.length]; 
-		int found = 0; 
-		
-		for( int i = 0; i < modes.length; i++ ){
-			if(    modes[i].getWidth() == xRes 
-			    && modes[i].getHeight() == yRes 
-			    && modes[i].getBitDepth() != 8 
-			    && modes[i].getBitDepth() != 16 
-			){
-				resultTemp[found] = modes[i].getRefreshRate(); 
-				found ++;
-			}
-		}
-		
-		int result[] = new int[found]; 
-		System.arraycopy( resultTemp, 0, result, 0, found );
-		
-		return result; 
+		}.start(); 
 	}
 
+
+	/**
+	 * Setting resolution is not possible with the SoftFullScreen object. 
+	 */
+	@Override
+	public void setResolution( int xRes, int yRes ) {
+		System.err.println( "Changing resolution is not supported in SoftFullScreen mode. " ); 
+		System.err.println( "Use the normal FullScreen mode to make use of that functionality.  " ); 
+	}
+
+	
 	/**
 	 * A sweet little helper. 
 	 */
@@ -361,7 +283,7 @@ public class FullScreen extends FullScreenBase {
 		public void post(){
 			skippedFrames ++; 
 			
-			if( skippedFrames >= 2 ){
+			if( skippedFrames >= 2 && canSwitch ){
 				setFullScreenImpl( state );
 				dad.unregisterPost( this );
 			}

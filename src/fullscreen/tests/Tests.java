@@ -8,7 +8,6 @@ import processing.core.PApplet;
 
 import fullscreen.FullScreen;
 import fullscreen.FullScreenTools;
-import fullscreen.SoftFullScreen;
 
 /**
  * Tests a few things semi-automatically... 
@@ -37,7 +36,7 @@ public class Tests {
 	public void softFS() throws Exception{
 		for( int screenNr = 0; screenNr < FullScreenTools.devices().length; screenNr ++ ){
 			Demo.Simple sketch = new Demo.Simple();
-			SoftFullScreen fs = new SoftFullScreen( sketch, screenNr );
+			FullScreen fs = new FullScreen( sketch, screenNr );
 			
 			Thread.sleep( 1000 );
 			for( int i = 0; i < 10; i++ ){
@@ -55,33 +54,12 @@ public class Tests {
 	}
 	
 	/**
-	 * Creates the "classic" FS object on screen 0 and 1. 
-	 */
-	@Test
-	public void classicFS() throws Exception{ 
-		for( int screenNr = 0; screenNr < 2; screenNr ++ ){
-			Demo.Simple sketch = new Demo.Simple();
-			FullScreen fs = new FullScreen( sketch, screenNr );
-			fs.setFullScreen( true );
-			
-			Thread.sleep( 2000 ); 
-			fs.setFullScreen( false ); 
-			
-			Thread.sleep( 2000 );
-			
-			sketch.frame.setVisible( false ); 
-			sketch.stop(); 
-			sketch.destroy(); 
-		}
-	}
-	
-	/**
 	 * Test split soft-fullscreen
 	 */
 	@Test
 	public void testSplit() throws Exception{
 		Demo.Simple sketch = new Demo.Simple();
-		SoftFullScreen fs = new SoftFullScreen( sketch );
+		FullScreen fs = new FullScreen( sketch );
 		fs.setScreens(
 			0, 0, 0, 400, 400, 
 			1, 0, 0, 800, 800 

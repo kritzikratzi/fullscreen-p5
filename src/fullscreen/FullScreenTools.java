@@ -143,4 +143,29 @@ public class FullScreenTools {
 		
 		return new Rectangle( ( targetWidth-newWidth)/2, ( targetHeight-newHeight)/2, newWidth, newHeight ); 
 	}
+	
+	
+	
+	// blub... 
+	private void setWindowSplittingEnabled( boolean state ){}
+	private void setBackground( int rgb ){}
+	private void setScalingMethod( int region, String method ){}
+	private void setEntersFullScreen( int region, boolean yes ){}
+	public static class Preset{
+		public static FullScreen onScreen( PApplet dad, int ... screen ){
+			return null;
+		}
+		
+		public static FullScreen onActiveScreen( PApplet dad ){
+			return null; 
+		}
+		
+		public static FullScreen controller( PApplet dad, int controlX, int controlY, int controlW, int controlH ){
+			return null;
+		}
+		
+		public static FullScreen stretch( PApplet dad ){
+			return null; 
+		}
+	}
 }

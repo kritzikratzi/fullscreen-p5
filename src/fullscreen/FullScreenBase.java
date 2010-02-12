@@ -15,7 +15,7 @@ import processing.core.PConstants;
 
 
 /**
- * The base class {@link FullScreen} and {@link SoftFullScreen} inherit from. <br /> 
+ * The base class {@link FullScreen} and {@link FullScreen} inherit from. <br /> 
  * 
  * It defines some common methods that you might wanna dig through (like {@link FullScreenBase#setShortcutsEnabled(boolean)})
  * @author hansi

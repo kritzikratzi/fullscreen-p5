@@ -1,25 +1,20 @@
-// demonstrates the use of a sketch that spans over two screens. 
-// you need to manually set the resolution of each screen to 
-// 1024x768 (both screens need to be the same!)
-// then run this sketch. 
-
+// very basic demonstration of the fullscreen api's capabilities
 import fullscreen.*; 
+import processing.opengl.*;
 
 FullScreen fs; 
+PImage img; 
 
 void setup(){
   // set size to 640x480
-  size(2048, 768);
+  size(640, 480, OPENGL);
 
   // 5 fps
   frameRate(5);
-
+  img = loadImage( "test.png" ); 
+  
   // Create the fullscreen object
   fs = new FullScreen(this); 
-  fs.setScreens( 
-    0, 0, 0, 1024, 768, // map the rectangle(0,0,1024,768) to screen 0
-    1, 1024, 0, 1024, 768 // map the rectangle (1024,0,1024,768) to screen 1
-  ); 
   
   // enter fullscreen mode
   fs.enter(); 
@@ -41,4 +36,6 @@ void draw(){
       width - i*20, height - i*20
     );
   }
+  
+  image( img, 10, 10 ); 
 }

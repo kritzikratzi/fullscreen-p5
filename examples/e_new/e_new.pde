@@ -1,7 +1,7 @@
 // Font's don't screw up anymore... yey! 
 import fullscreen.*; 
 
-SoftFullScreen fs; 
+FullScreen fs; 
 PFont font; 
 
 void setup(){
@@ -12,12 +12,12 @@ void setup(){
   frameRate(30);
 
   // Create the fullscreen object
-  fs = new SoftFullScreen(this); 
+  fs = new FullScreen(this); 
 
   // enter fullscreen mode
   fs.enter(); 
   
-  //
+  // Create a new font
   font = loadFont( "Serif-24.vlw" ); 
   textFont( font ); 
 }
