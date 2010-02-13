@@ -21,38 +21,105 @@ public class Demo{
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * This is a simple Sketch using the JAVA-2D renderer
+	 * This is a simple Sketch
 	 * @author hansi
-	 *
 	 */
 	public static class Simple extends LaunchablePApplet{
 		private static final long serialVersionUID = 1L;
 
+		// Which renderer should we use? 
+		private final String renderThing;
+		
+		// What size do we want? 
+		private final int w, h; 
+		
+		private String title;
+		private boolean reloadFont;
+		
+		/**
+		 * Creates the simple sketch using the JAVA2D renderer
+		 */
+		public Simple( String title ){
+			this( title, 800, 600, JAVA2D );
+		}
+		
+		/**
+		 * Creates a simple sketch using any renderer at 800x600 px
+		 */
+		public Simple( String title, String renderer ){
+			this( title, 800, 600, renderer ); 
+		}
+		
+		/**
+		 * Creates a simple sketch using a special renderer
+		 */
+		public Simple( String title, int width, int height, String renderer ){
+			super( false ); 
+			this.title = title; 
+			this.renderThing = renderer; 
+			this.w = width; 
+			this.h = height;
+			
+			startPApplet();
+		}
+		
+		/**
+		 * FS-Api tells us that we switched mode
+		 */
+		public void displayChanged(){
+			reloadFont = true;  
+		}
+		
 		@Override
 		public void setup(){
-			size( 400, 400 ); 
+			size( w, h, renderThing );
+			frameRate( 200 );
+			reloadFont = true; 
+			smooth(); 
 		}
 		
 		@Override
 		public void draw(){
-			noStroke(); 
+			if( reloadFont ){
+				textFont( loadFont( "dependencies/Silkscreen-32.vlw" ) );
+				reloadFont = false; 
+			}
 			
-			for( int i = 0; i < min( width/2, height/2 ); i+= 20 ){
-				fill( ( i/5 + frameCount )%255 ); 
-				rect( i, i, width - 2*i, height - 2*i ); 
+			background( 255 ); 
+			stroke( 0 );  
+
+			background(0);
+			fill(255, 0, 0);
+
+			text( title + " @" + (int)frameRate + "fps", 10, 40 ); 
+			for(int i = 0; i < width; i += 40 ){
+				for( int j = 80; j < height; j+= 40 ){
+					char text = (char)((i*width/20+j+frameCount)%255); 
+					text( text, i, j ); 
+				}
 			}
 		}
-		
 	}
 
+	
 	/**
 	 * This is a PApplet that actually launches itself when instantized.
 	 * (That means no trouble with the main-method...)  
 	 */
-	private static class LaunchablePApplet extends PApplet{
+	public static class LaunchablePApplet extends PApplet{
 		private static final long serialVersionUID = 1L;
 
 		public LaunchablePApplet(){
+			this( true ); 
+		}
+		
+		public LaunchablePApplet( boolean autostart ){
+			if( autostart ){
+				startPApplet(); 
+			}
+		}
+			
+		public void startPApplet(){
 			// Disable abyssmally slow Sun renderer on OS X 10.5.
 			if ( PApplet.platform == PApplet.MACOSX ){
 				// Only run this on OS X otherwise it can cause a permissions error.
@@ -141,8 +208,8 @@ public class Demo{
 			if (this.displayable()) {
 				frame.setVisible(true);
 			}
-		this.requestFocus(); // ask for keydowns
-		//System.out.println("exiting main()");
+			this.requestFocus(); // ask for keydowns
+			//System.out.println("exiting main()");
+		}
 	}
-}
 }

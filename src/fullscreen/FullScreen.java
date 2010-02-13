@@ -27,6 +27,7 @@ import java.awt.DisplayMode;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Window;
 
 import processing.core.PApplet;
 
@@ -88,10 +89,11 @@ public class FullScreen extends FullScreenBase {
 		}
 		
 		fsDevice = devices[screenNr]; 
-		fsFrame = new Frame(); 
+		fsFrame = new Frame( dad.frame == null? "":dad.frame.getTitle() ); 
 		fsFrame.setTitle( dad.frame.getTitle() ); 
 		fsFrame.setUndecorated( true ); 
-		fsFrame.setBackground( Color.black ); 
+		fsFrame.setBackground( Color.black );
+		fsFrame.setIgnoreRepaint( true ); 
 		if( dad.width > 0 ){
 			setResolution( dad.width, dad.height );
 		}
@@ -157,11 +159,11 @@ public class FullScreen extends FullScreenBase {
 				dad.frame.remove( dad ); 
 				fsFrame.setVisible( true );
 				fsFrame.setLayout( null ); 
-				fsFrame.setSize( dad.width, dad.height ); 
+				fsFrame.setSize( dad.width, dad.height );
 				fsFrame.add( dad ); 
 				fsDevice.setFullScreenWindow( fsFrame );
-				fsFrame.setExtendedState( Frame.MAXIMIZED_BOTH );
 				setResolution( 0, 0 ); 
+				fsFrame.setExtendedState( Frame.MAXIMIZED_BOTH );
 				
 				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 );
 				

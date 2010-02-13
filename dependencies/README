@@ -7,14 +7,15 @@ under the gpl. The sources can fetched from here:
 
 
 core.jar, 
-opengl.jar:     Part of processing
+opengl/*:       Part of processing/jogl
                 http://www.processing.org
-                
-jogl.jar:       Part of Java-OpenGL, 
                 https://jogl.dev.java.net/
 
 stylesheet.css: Part of the processing-library-template project
                 http://code.google.com/p/processing-library-template/ 
                 
 junit-4.7.jar:  JUnit Testing Framework
-				http://www.junit.org
+                http://www.junit.org
+				
+Silkscreen-32.vlw: A font by kottke
+                http://kottke.org/plus/type/silkscreen/

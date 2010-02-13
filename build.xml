@@ -24,9 +24,9 @@
 	<property name="sketch.path" value="${user.home}/Documents/Processing" />
 	
 	<property name="version" value="0.98.4-testing" />
-	<fileset id="cp" includes="dependencies/*.jar" />
+	<fileset id="cp" includes="dependencies/**/*.jar" />
 	<path id="cp">
-		<fileset dir="." includes="dependencies/*.jar" />
+		<fileset dir="." includes="dependencies/**/*.jar" />
 	</path>
 	
 	<!-- empty the binary folder -->
@@ -55,10 +55,10 @@
 				 windowtitle="Javadocs: Fullscreen API">
 			<link href="http://java.sun.com/javase/6/docs/api" />
 			<link href="http://dev.processing.org/reference/everything/javadoc/" />
-			<fileset dir="src" includes="fullscreen/**/*.java" excludes="fullscreen/tests/**" />
+			<fileset dir="src" includes="**/*.java" excludes="fullscreen/tests/**" />
 		</javadoc>
 	</target>
-		
+	
 		
 	<!-- create the files for the website -->
 	<target name="dist" depends="compile, reference" description="export library to the dist folder">
@@ -116,7 +116,7 @@
 			<formatter type="plain"/>
 			<classpath refid="cp" />
 			<classpath location="bin" />
-			<jvmarg value="-Djava.library.path=lib"/>
+			<jvmarg value="-Djava.library.path=lib${path.separator}dependencies/opengl"/>
 			<test name="fullscreen.tests.Tests"/>
 		</junit>
 	</target>

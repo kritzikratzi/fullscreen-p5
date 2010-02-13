@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="dependencies/jogl.jar"/>
-	<classpathentry kind="lib" path="dependencies/processing-core.jar"/>
-	<classpathentry kind="lib" path="dependencies/processing-opengl.jar"/>
 	<classpathentry kind="lib" path="dependencies/junit-4.7.jar"/>
+	<classpathentry kind="lib" path="dependencies/core.jar"/>
+	<classpathentry kind="lib" path="dependencies/opengl/jogl.jar"/>
+	<classpathentry kind="lib" path="dependencies/opengl/opengl.jar"/>
+	<classpathentry kind="lib" path="dependencies/opengl/gluegen-rt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
