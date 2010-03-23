@@ -23,6 +23,7 @@ package fullscreen;
 import japplemenubar.JAppleMenuBar;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -201,7 +202,10 @@ public class SoftFullScreen extends FullScreenBase{
 				
 				fsFrame.setVisible( true ); 
 				fsFrame.setLocation( fsDevice.getDefaultConfiguration().getBounds().getLocation() );
-				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 - 1 ); 
+				
+				boolean usesEntireScreen = fsDevice.getDefaultConfiguration().getBounds().getSize().equals( new Dimension( dad.width, dad.height ) );
+				int appleDriversSuck = PApplet.platform == PConstants.MACOSX && usesEntireScreen? 1:0;  
+				dad.setLocation( ( fsFrame.getWidth() - dad.width ) / 2, ( fsFrame.getHeight() - dad.height ) / 2 - appleDriversSuck ); 
 				fsFrame.setExtendedState( Frame.MAXIMIZED_BOTH );		
 				
 				GLDrawableHelper.reAllocate( this ); 
