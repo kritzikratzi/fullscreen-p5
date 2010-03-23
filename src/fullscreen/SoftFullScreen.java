@@ -29,6 +29,9 @@ import java.awt.GraphicsEnvironment;
 
 import processing.core.PApplet;
 import processing.core.PConstants;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 /**
  *  Creates a new softfullscreen object. <br>
@@ -90,9 +93,20 @@ public class SoftFullScreen extends FullScreenBase{
 			screenNr = 0; 
 		}
 		
-		fsDevice = devices[screenNr]; 
+		fsDevice = devices[screenNr];
+		WindowListener listener = new WindowAdapter(){
+			public void windowDeiconified( WindowEvent w ){
+				if( isFullScreen() && PApplet.platform == PConstants.MACOSX ){
+					new JAppleMenuBar().setVisible( false );
+				}
+
+			}
+		};
+
 		fsFrame = new Frame( fsDevice.getDefaultConfiguration() );
-		fsFrame.setTitle( dad.frame == null? "":dad.frame.getTitle() ); 
+		fsFrame.addWindowListener(listener);
+		fsFrame.setTitle( dad.frame == null? "":dad.frame.getTitle() );
+		fsFrame.setIconImage( dad.frame.getIconImage() );
 		fsFrame.setUndecorated( true ); 
 		fsFrame.setBackground( Color.black ); 
 		fsFrame.setLayout( null ); 
@@ -113,6 +127,38 @@ public class SoftFullScreen extends FullScreenBase{
 		return fsFrame.isVisible();  
 	}
 	
+	/**
+	 * Allow for minimizing the frame
+	 */
+	public void minimize(){
+		if( isFullScreen() ){
+			if( PApplet.platform == PConstants.MACOSX ){
+				new JAppleMenuBar().setVisible( true );
+			}
+			fsFrame.setState( Frame.ICONIFIED );
+		}
+		else{
+			dad.frame.setState( Frame.ICONIFIED );
+		}
+	}
+	
+	/**
+	 * Restores the frame after it has been minimized. 
+	 * If it wasn't minimized this doesn't do much! 
+	 */
+	public void restore(){
+		if( isFullScreen() ){
+			fsFrame.setState( Frame.NORMAL ); 
+			
+			if( PApplet.platform == PConstants.MACOSX ){
+				new JAppleMenuBar().setVisible( false );
+			}
+		}
+		else{
+			dad.frame.setState( Frame.NORMAL ); 
+		}
+	}
+
 	
 	/**
 	 * FullScreen is only available is applications, not in applets! 
