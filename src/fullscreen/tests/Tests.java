@@ -120,18 +120,17 @@ public class Tests {
 		fs.setFullScreen( true );  
 		
 		Thread.sleep( 2000 );
-		if( sketch.frameRate < 90 ){
-			fs.leave(); 
-			killSketch( sketch ); 
+		float fps = sketch.frameRate; 
+		fs.leave(); 
+		killSketch( sketch ); 
+
+		if( fps < 90 ){
 			fail( 
 				"Framerate too low on " + fsClass.getName() + ": " + 
 				"[" + width + "x" + height + "@" + sketch.frameRate + "fps]" 
 			); 
 		}
-		else{
-			fs.leave(); 
-			killSketch( sketch );
-		}
+		
 	}
 	
 	
