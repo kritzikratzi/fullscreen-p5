@@ -1,5 +1,7 @@
 package fullscreen;
 
+import japplemenubar.JAppleMenuBar;
+
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
@@ -43,7 +45,7 @@ public abstract class FullScreenBase {
 		
 		// Listen to processings key events
 		dad.registerKeyEvent( this );
-
+		if( dad.frame != null ) registerFrame( dad.frame ); 
 		Class<?> clazz = dad.g.getClass(); 
 		while( clazz != null  ){
 			if( clazz.getName().equals( "processing.opengl.PGraphicsOpenGL" ) )
@@ -119,6 +121,15 @@ public abstract class FullScreenBase {
 		
 		// Window listener
 		f.addWindowListener( new WindowAdapter(){
+			public void windowDeiconified( WindowEvent w ){
+				dad.loop(); 
+			}
+			
+			@Override
+			public void windowIconified( WindowEvent e ){
+				dad.noLoop();
+			}
+			
 			public void windowClosing( WindowEvent e ){
 				dad.exit();
 			}

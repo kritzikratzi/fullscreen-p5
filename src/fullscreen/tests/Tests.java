@@ -100,7 +100,6 @@ public class Tests {
 		assertFrameRate( 640, 480, SoftFullScreen.class ); 
 	}
 	
-	
 	/**
 	 * Tests if the framerate is larger than a certain value. 
 	 * @throws NoSuchMethodException 
@@ -133,6 +132,32 @@ public class Tests {
 		
 	}
 	
+	/**
+	 * Tests if the frame really pauses when iconified, and also that it automatically continues when deiconified
+	 */
+	@Test
+	public void iconify() throws Exception{
+		Demo.Simple sketch = new Demo.Simple( "iconify", 640, 480, PApplet.JAVA2D );
+		sketch.frameRate( 60 );
+		
+		SoftFullScreen fs = new SoftFullScreen( sketch );
+		Thread.sleep( 2000 ); 
+		
+		fs.minimize(); 
+		int startFrameNum = sketch.frameCount; 
+		Thread.sleep( 2000 ); 
+		int finalFrameNum = sketch.frameCount; 
+		fs.restore(); 
+		
+		killSketch( sketch ); 
+		
+		if( finalFrameNum - startFrameNum > 10 ){
+			fail( "Sketch didn't pause when iconified! [" + (finalFrameNum - startFrameNum) + " frames were drawn]" );
+		}
+
+	}
+	
+
 	
 	/**
 	 * Kill a sketch
