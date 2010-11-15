@@ -53,8 +53,12 @@ import java.awt.event.WindowListener;
  */
 
 public class SoftFullScreen extends FullScreenBase{
-	// We use this frame to go to fullScreen mode...
-	Frame fsFrame; 
+	/** 
+	 * This frame is used when the application is in fullscreen mode. 
+	 * It's only public so you can easily hack around, if you use it 
+	 * please don't complain if things change. 
+	 */
+	public Frame fsFrame; 
 	GraphicsDevice fsDevice;
 	
 	//AWTEventListener fsKeyListener;

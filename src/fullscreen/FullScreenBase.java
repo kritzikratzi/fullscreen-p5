@@ -1,7 +1,5 @@
 package fullscreen;
 
-import japplemenubar.JAppleMenuBar;
-
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
@@ -35,7 +33,11 @@ public abstract class FullScreenBase {
 	static KeyEvent lastEvent = null;
 	
 	// Is opengl being used in this sketch? 
-	private boolean isGL; 
+	private boolean isGL;
+	
+	// Pause on minification? 
+	private boolean pauseWhenHidden = true; 
+	
 	
 	/**
 	 * Create a fullscreen thingie
@@ -109,6 +111,30 @@ public abstract class FullScreenBase {
 	
 	
 	/**
+	 * Are shortscuts allowed? 
+	 */
+	public boolean getShortcutsEnabled(){
+		return enableKeyEvents; 
+	}
+	
+	/**
+	 * Changes the behaviour when the sketch is minified. 
+	 * By default noLoop() is called when the sketch is put to the taskbar/dock.
+	 * 
+	 * @param state Set to true if you want the sketch to the paused and resumed automatically. Defaults to true. 
+	 */
+	public void setPauseWhenHidden( boolean state ){
+		pauseWhenHidden = state; 
+	}
+	
+	/**
+	 * Returns whether the sketch should automatically be paused when minified. 
+	 */
+	public boolean getPauseWhenHidden(){
+		return pauseWhenHidden; 
+	}
+	
+	/**
 	 * Whatever frame this specific implementation uses, it has to be registered here so that key events can be caught
 	 */
 	protected void registerFrame( Frame f ){
@@ -122,12 +148,12 @@ public abstract class FullScreenBase {
 		// Window listener
 		f.addWindowListener( new WindowAdapter(){
 			public void windowDeiconified( WindowEvent w ){
-				dad.loop(); 
+				if( pauseWhenHidden ) dad.loop(); 
 			}
 			
 			@Override
 			public void windowIconified( WindowEvent e ){
-				dad.noLoop();
+				if( pauseWhenHidden ) dad.noLoop();
 			}
 			
 			public void windowClosing( WindowEvent e ){

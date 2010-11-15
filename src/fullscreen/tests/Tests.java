@@ -149,12 +149,20 @@ public class Tests {
 		int finalFrameNum = sketch.frameCount; 
 		fs.restore(); 
 		
-		killSketch( sketch ); 
 		
 		if( finalFrameNum - startFrameNum > 10 ){
 			fail( "Sketch didn't pause when iconified! [" + (finalFrameNum - startFrameNum) + " frames were drawn]" );
 		}
+		
+		startFrameNum = sketch.frameCount; 
+		Thread.sleep( 2000 ); 
+		finalFrameNum = sketch.frameCount; 
+		
+		if( finalFrameNum - startFrameNum < 10 ){
+			fail( "Sketch didn't resume when restored! [" + (finalFrameNum - startFrameNum ) + " frames were drawn]" );  
+		}
 
+		killSketch( sketch ); 
 	}
 	
 

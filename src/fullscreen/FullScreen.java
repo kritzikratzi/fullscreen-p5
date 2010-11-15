@@ -27,7 +27,6 @@ import java.awt.DisplayMode;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Window;
 
 import processing.core.PApplet;
 
