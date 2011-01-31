@@ -65,6 +65,9 @@ public class SoftFullScreen extends FullScreenBase{
 	
 	// the first time wait until the frame is displayed
 	boolean fsIsInitialized; 
+
+  // are we in kiosk mode? (OS X only)
+  boolean kioskMode;
 	
 	// Daddy...
 	PApplet dad; 
@@ -78,17 +81,30 @@ public class SoftFullScreen extends FullScreenBase{
 	public SoftFullScreen( PApplet dad ){
 		this( dad, 0 ); 
 	}
+
+  /**
+   * Creates a new softfullscreen object on a specific screen
+   * (numbering starts at 0)
+   *
+	 * @param dad The parent sketch (usually "this")
+	 * @param screenNr The screen number. 
+   */
+  public SoftFullScreen( PApplet dad, int screenNr ){
+    this( dad, screenNr, false );
+  }
 	
 	/**
 	 * Creates a new softfullscreen object on a specific screen 
-	 * (numbering starts at 0)
+	 * (numbering starts at 0) optionally in kiosk mode.
 	 * 
 	 * @param dad The parent sketch (usually "this")
 	 * @param screenNr The screen number. 
+   * @param kioskMode Enable/disable kiosk mode (OS X only)
 	 */
-	public SoftFullScreen( PApplet dad, int screenNr ){
+	public SoftFullScreen( PApplet dad, int screenNr, boolean kioskMode ){
 		super( dad ); 
 		this.dad = dad;
+    this.kioskMode = kioskMode;
 		
 		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		if( screenNr >= devices.length ){
@@ -102,7 +118,7 @@ public class SoftFullScreen extends FullScreenBase{
 		WindowListener listener = new WindowAdapter(){
 			public void windowDeiconified( WindowEvent w ){
 				if( isFullScreen() && PApplet.platform == PConstants.MACOSX ){
-					new JAppleMenuBar().setVisible( false );
+					new JAppleMenuBar().setVisible( false, SoftFullScreen.this.kioskMode );
 				}
 
 			}
@@ -156,7 +172,7 @@ public class SoftFullScreen extends FullScreenBase{
 			fsFrame.setState( Frame.NORMAL ); 
 			
 			if( PApplet.platform == PConstants.MACOSX ){
-				new JAppleMenuBar().setVisible( false );
+				new JAppleMenuBar().setVisible( false, kioskMode );
 			}
 		}
 		else{
@@ -201,7 +217,7 @@ public class SoftFullScreen extends FullScreenBase{
 				fsFrame.add( dad ); 
 				
 				if( PApplet.platform == PConstants.MACOSX ){
-					new JAppleMenuBar().setVisible( false ); 
+					new JAppleMenuBar().setVisible( false, kioskMode ); 
 				}
 				
 				fsFrame.setVisible( true ); 

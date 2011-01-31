@@ -33,5 +33,11 @@ public class JAppleMenuBar {
 		System.loadLibrary( "jAppleMenuBar" ); 
 	}
 	
-	public native void setVisible( boolean visibility ); 
+	public native void setVisible( boolean visibility, boolean kioskMode ); 
+
+  public void setVisible( boolean visibility )
+  {
+    // Keep original API in-tact.  Default kiosk-mode to off.
+    setVisible( visibility, false );
+  }
 }
