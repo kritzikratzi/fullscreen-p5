@@ -66,8 +66,8 @@ public class SoftFullScreen extends FullScreenBase{
 	// the first time wait until the frame is displayed
 	boolean fsIsInitialized; 
 
-  // are we in kiosk mode? (OS X only)
-  boolean kioskMode;
+	// are we in kiosk mode? (OS X only)
+	boolean kioskMode;
 	
 	// Daddy...
 	PApplet dad; 
@@ -104,7 +104,7 @@ public class SoftFullScreen extends FullScreenBase{
 	public SoftFullScreen( PApplet dad, int screenNr, boolean kioskMode ){
 		super( dad ); 
 		this.dad = dad;
-    this.kioskMode = kioskMode;
+		setKioskMode( kioskMode ); 
 		
 		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		if( screenNr >= devices.length ){
@@ -120,10 +120,9 @@ public class SoftFullScreen extends FullScreenBase{
 				if( isFullScreen() && PApplet.platform == PConstants.MACOSX ){
 					new JAppleMenuBar().setVisible( false, SoftFullScreen.this.kioskMode );
 				}
-
 			}
 		};
-
+		
 		fsFrame = new Frame( fsDevice.getDefaultConfiguration() );
 		fsFrame.addWindowListener(listener);
 		fsFrame.setTitle( dad.frame == null? "":dad.frame.getTitle() );
@@ -273,5 +272,17 @@ public class SoftFullScreen extends FullScreenBase{
 	public void setResolution( int xRes, int yRes ) {
 		System.err.println( "Changing resolution is not supported in SoftFullScreen mode. " ); 
 		System.err.println( "Use the normal FullScreen mode to make use of that functionality.  " ); 
+	}
+	
+	/**
+	 * Changes kiosk mode, this will only apply once you (re-)enter fullscreen mode. 
+	 */
+	public void setKioskMode( boolean kioskMode ){
+		this.kioskMode = kioskMode;
+		
+		if( kioskMode && PApplet.platform != PConstants.MACOSX ){
+			System.err.println( "Warning: Kiosk Mode only works on Mac OS X. " ); 
+			System.err.println( "         Continuing without kiosk mode. " ); 
+		}
 	}
 }

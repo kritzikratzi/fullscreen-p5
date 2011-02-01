@@ -1,6 +1,11 @@
 package fullscreen.tests;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import japplemenubar.JAppleMenuBar;
@@ -165,7 +170,50 @@ public class Tests {
 		killSketch( sketch ); 
 	}
 	
+	
+	/**
+	 * Tests if kiosk mode works. 
+	 */
+	@Test
+	public void kioskMode() throws Exception {
+		Demo.Simple sketch = new Demo.Simple( "kiosk mode", 640, 480, PApplet.JAVA2D );
+		if( PApplet.platform == PApplet.MACOSX ){
+			sketch.frameRate( 60 );
+			
+			SoftFullScreen fs = new SoftFullScreen( sketch );
+			fs.setKioskMode(  true  ); 
+			fs.enter();
+			
+			Thread.sleep( 500 );
+			Robot r = new Robot(); 
+			r.setAutoDelay( 100 ); 
+			
+			// let's get the keyboard focus by clicking our sketch
+			Point where = sketch.getLocationOnScreen(); 
+			r.mouseMove( where.x + 100, where.y + 100 );  
+			r.mousePress(  MouseEvent.BUTTON1_MASK );
+			r.mouseRelease( MouseEvent.BUTTON1_MASK );
+			Thread.sleep( 5000 ); 
 
+			// press apple+tab
+			/*r.keyPress( KeyEvent.VK_META );
+			r.keyPress( KeyEvent.VK_Q );
+			r.keyRelease( KeyEvent.VK_META ); 
+			r.keyRelease(  KeyEvent.VK_Q );*/
+			
+			//r.mousePress(  MouseEvent.BUTTON1_MASK );
+			//r.mouseRelease( MouseEvent.BUTTON1_MASK );
+			
+			// yea, this doesn't really check anything at this point
+			if( !sketch.hasFocus() ){
+				fail( "Kiosk mode not working [frame should have focus after pressing apple+tab, but it doesn't]" ); 
+			}
+			
+			fs.leave(); 
+		}
+		
+		killSketch( sketch ); 
+	}
 	
 	/**
 	 * Kill a sketch
